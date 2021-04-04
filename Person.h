@@ -1,11 +1,11 @@
 #include <iostream>
-
+#include <string>
 using namespace std;
 
 struct Person {
-private:
+protected:
     int id;
-    char* firstName, *lastName, *dob, *pass;
+    string firstName, lastName, dob, pass;
     bool gender;
 
 public:
@@ -24,4 +24,27 @@ public:
         cout << "Day of birth: " << dob << '\n';
         cout << "Gender: " << (gender ? "Female" : "Male") << '\n';
     }
-};
+
+    int ID()
+    {
+        return id;
+    }
+
+    string info(string input)
+    {
+        string si;
+        if (input == "FirstName")
+            si = firstName;
+        else if (input == "LastName")
+            si = lastName;
+        else if (input == "DoB")
+            si = dob;
+        else if (input == "Gender")
+        {    
+            if (gender)
+                si ="1";
+            else si = "0";
+        }
+        return si;
+    }
+}; 
