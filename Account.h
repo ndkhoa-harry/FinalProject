@@ -6,35 +6,69 @@ using namespace std;
 struct Account {
 private:
     int id;
-    char* pass;
+    string pass;
+
 public:
-    Account(int id, char* pass) {
+    Account() { }
+
+    Account(int id, string pass) {
         this -> id = id;
         this -> pass = pass;
     }
+    
+    void setId(int id) { this -> id = id; }
 
-    ~Account() {
-        if (pass) delete[] pass;
-    }
+    int getId() { return id; }
 
-    Account findAccountFromFile(char* fileName, int id) {
+    void setPass(string pass) { this -> pass = pass; }
+
+    string getPass() { return pass; }
+
+    static Account findAccountFromFile(string fileName, int id) {
         ifstream inp(fileName);
 
-        int tmpId;
-        char* tmpPass = new char[100];
+        if (inp) {
+            int tmpId;
+            string tmpPass;
 
-        while (inp >> tmpId) {
-            inp >> tmpPass;
+            while (inp >> tmpId) {
+                inp >> tmpPass;
 
-            if (tmpId == id) {
-                inp.close();
+                if (tmpId == id) {
+                    inp.close();
 
-                return Account(id, tmpPass);
+                    return Account(id, tmpPass);
+                }
             }
+
+            inp.close();
         }
 
-        inp.close();
+        return Account(-1, NULL);
+    }
 
-        return Account(-1, nullptr);
+    void changePassword(string fileName, string newPass) {
+        ifstream inp(fileName);
+        ofstream out("Temporary.txt");
+
+        if (inp) {
+            int tmpId;
+            string tmpPass;
+
+            while (inp >> tmpId) {
+                inp >> tmpPass;
+
+                if (tmpId == id) 
+                    out << tmpId << ' ' << newPass << '\n';
+                else 
+                    out << tmpId << ' ' << tmpPass << '\n';
+            }
+
+            out.close();
+            inp.close();
+
+            remove ("Accounts.txt");
+            rename("Temporary.txt", "Accounts.txt");
+        }
     }
 };

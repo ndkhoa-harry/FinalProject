@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "chrono": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "iosfwd": "cpp"
+    }
+}

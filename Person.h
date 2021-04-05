@@ -1,46 +1,52 @@
+#ifndef _PERSON_H_
+#define _PERSON_H_
+
 #include <iostream>
 #include <string>
 using namespace std;
 
 struct Person {
-protected:
+private:
     int id;
-    char* firstName,* lastName,* dob;
-    bool gender;
+    string firstName, lastName, gender, dob;
 
 public:
-    Person(int id, char* firstName, char* lastName, char* dob, bool gender) {
+    Person() { }
+
+    Person(int id, string firstName, string lastName, string gender, string dob) {
         this->id = id;
         this->firstName = firstName;
         this->lastName = lastName;
-        this->dob = dob;
         this->gender = gender;
+        this->dob = dob;
     }
 
     void display() {
         cout << "ID: " << id << '\n';
-        cout << "Full name: " << firstName << " " << lastName << '\n';
+        cout << "Full name: " << lastName << " " << firstName << '\n';
         cout << "Day of birth: " << dob << '\n';
-        cout << "Gender: " << (gender ? "Female" : "Male") << '\n';
+        cout << "Gender: " << gender << '\n';
     }
 
-    int ID()
-    {
-        return id;
-    }
+    void setId(int id) { this -> id = id; }
 
-    char* info(int input)
-    {
-        if (input == 1)
-            return firstName;
-        else if (input == 2)
-            return lastName;
-        else if (input == 3)
-            return dob;
-    }
+    int getId() { return id; }
 
-    bool gendr()
-    {
-        return gender;
-    }
+    void setFirstName(char* firstName) { this -> firstName = firstName; }
+
+    string getFirstName() { return firstName; }
+
+    void setLastName(char* lastName) { this -> lastName = lastName; }
+
+    string getLastName() { return lastName; }
+
+    void setGender(string gender) { this -> gender = gender; }
+
+    string getGender() { return gender; }
+
+    void setDob(char* dob) { this -> dob = dob; }
+
+    string getDob() { return dob; }
 }; 
+
+#endif

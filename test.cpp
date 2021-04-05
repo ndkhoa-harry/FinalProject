@@ -1,5 +1,9 @@
-#include "test.h"
+#include "main.h"
 
 int main() {
-    cout << "testing...\n";
+    Class cur("20CTT2");
+
+    cur.inputFromCSV("20CTT2.csv");
+
+    cur.display();
 }

@@ -7,6 +7,7 @@
 #include "Staff.h"
 #include "Student.h"
 #include "Account.h"
+#include "Class.h"
 
 using namespace std;
 
