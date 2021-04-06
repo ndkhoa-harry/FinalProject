@@ -1,5 +1,5 @@
 #include "Person.h"
 
-struct Staff : public Person {
+class Staff : public Person {
     
 };

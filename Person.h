@@ -5,7 +5,7 @@
 #include <string>
 using namespace std;
 
-struct Person {
+class Person {
 private:
     int id;
     string firstName, lastName, gender, dob;
