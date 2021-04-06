@@ -1,11 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include "Student.h"
 
 using namespace std;
 
-struct Class {
+class Class {
 private:
     struct Node {
         Student data;
@@ -13,16 +12,18 @@ private:
     }; 
 
     string name;
-    int studentCount;
     Node* head, *tail;
+    int studentsCount;
 
 public:
+    Class() { }
+
     Class(string name) {
         this -> name = name; 
 
         head = nullptr;
         tail = nullptr;
-        studentCount = 0;
+        studentsCount = 0;
     }
 
     ~Class() {
@@ -46,7 +47,7 @@ public:
         tail -> data = student;
         tail -> next = nullptr;
 
-        studentCount++;
+        studentsCount++;
     }
 
     void inputFromCSV(string fileName) {

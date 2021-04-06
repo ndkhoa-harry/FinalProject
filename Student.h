@@ -3,7 +3,7 @@
 
 #include "Person.h"
 
-struct Student : public Person {
+class Student : public Person {
 private:
     int no;
     

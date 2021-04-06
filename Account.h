@@ -3,7 +3,7 @@
 
 using namespace std;
 
-struct Account {
+class Account {
 private:
     int id;
     string pass;
