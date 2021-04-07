@@ -47,33 +47,49 @@ struct cvsFile
 {
 private:
     string fileName;
+    string folderName;
 
 public:
-    cvsFile(string filename) : fileName(filename)
+    //  FOLDER: NHAP DUONG DAN TOI FOLDER MUON TAO HOAC TEN FOLDER MUON MO
+    cvsFile(string filename, string foldername = "") : fileName(filename), folderName(foldername)
     {
+        if (folderName != "")
+        {
+            fileName.insert(0, "/");
+            fileName.insert(0, folderName);
+            for (int i = 0; i < folderName.length(); i++)
+            {
+                if (folderName[i] == '/')
+                    folderName.replace(i, 1, "\\");
+            }
+            folderName.insert(0, "mkdir ");
+            system(stc(folderName));
+            system("cls");
+        }
         fstream ofs;
-        ofs.open(filename);
+        ofs.open(fileName);
         if (ofs.fail())
-            ofs.open(filename, ios::out);
+            ofs.open(fileName, ios::out);
         ofs.close();
+        return;
     }
 
     Person *FindPerson(int ID)
     {
         ifstream ifs(fileName);
         string info;
-        string pos[5];
+        string pos[6];
         while (!ifs.eof())
         {
             getline(ifs, info, '\n');
             stringstream s(info);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 getline(s, pos[i], ',');
             }
-            if (sti(pos[0]) == ID)
+            if (sti(pos[1]) == ID)
             {
-                Person *a = new Person(ID, pos[1], pos[2], pos[4], pos[3]);
+                Person *a = new Person(ID, pos[2], pos[3], pos[5], pos[4]);
                 return a;
             }
         }
@@ -85,10 +101,19 @@ public:
         Person *pe = this->FindPerson(a.getId());
         if (pe != nullptr)
             return;
-        ofstream ofs(fileName, ios::app);
-        ofs << "\n"
-            << a.getId() << "," << a.getFirstName() << "," << a.getLastName() << "," << a.getDob() << "," << a.getGender();
-        ofs.close();
+        ifstream ifs(fileName);
+        string s;
+        while (!ifs.eof())
+            getline(ifs, s);
+        int i = 0;
+        for (i; s[i] != ','; i++)
+            ;
+        s.replace(i, s.length() - i, "");
+        ifs.close();
+        ofstream fs(fileName, ios::app);
+        fs << "\n"
+           << sti(s) + 1 << "," << a.getId() << "," << a.getFirstName() << "," << a.getLastName() << "," << a.getDob() << "," << a.getGender();
+        fs.close();
     }
 
     void AddString(string s)
@@ -104,8 +129,9 @@ public:
         bool ok = (re == 0) ? 1 : 0;
         return ok;
     }
-
-    void ChangeScore(int ID, int index, string replace)
+    
+    //USE THIS FUNC TO CHANGE POINT(INDEX OF POINT), PASS(INDEX = 1)
+    void Change(int ID, int index, string replace)
     {
         fstream f(fileName, ios::in);
         string data;
@@ -128,6 +154,50 @@ public:
         f.open(fileName, ios::out);
         f << data;
         f.close();
+    }
+
+    void ReadFile()
+    {
+        ifstream ifs(fileName);
+        string s;
+        getline(ifs, s, '\0');
+        cout << s;
+        ifs.close();
+    }
+
+    string GetLine(int line_num, int index)
+    {
+        ifstream ifs(fileName);
+        string s;
+        for (int i = 0; i < line_num; i++)
+            getline(ifs, s, '\n');
+        for (int i = 0; i < index; i++)
+        {
+            int j = 0;
+            for (j = 0; s[j] != ','; j++)
+                ;
+            s.replace(0, j + 1, "");
+        }
+        int j = 0;
+        for (j = 0; s[j] != ',' && s[j] != '\n'; j++)
+            ;
+        s.replace(j, s.length() - j, "");
+        return s;
+    }
+
+    string GetPassword(int ID)
+    {
+        ifstream ifs(fileName);
+        while (!ifs.eof())
+        {
+            int id;
+            string pass;
+            ifs >> id;
+            ifs >> pass;
+            if (id == ID)
+                return pass;
+        }
+        return "";
     }
 };
 
