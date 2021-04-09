@@ -2,6 +2,7 @@
 #define VINH
 #include <fstream>
 #include <sstream>
+#include <conio.h>
 #include "Person.h"
 using namespace std;
 //DOI KIEU STRING SANG INTEGER
@@ -43,7 +44,7 @@ string its(int num)
     return re;
 }
 
-struct cvsFile
+class cvsFile
 {
 private:
     string fileName;
@@ -129,7 +130,7 @@ public:
         bool ok = (re == 0) ? 1 : 0;
         return ok;
     }
-    
+
     //USE THIS FUNC TO CHANGE POINT(INDEX OF POINT), PASS(INDEX = 1)
     void Change(int ID, int index, string replace)
     {
@@ -170,7 +171,10 @@ public:
         ifstream ifs(fileName);
         string s;
         for (int i = 0; i < line_num; i++)
-            getline(ifs, s, '\n');
+            if (!ifs.eof())
+                getline(ifs, s, '\n');
+            else return "";
+        ifs.close();
         for (int i = 0; i < index; i++)
         {
             int j = 0;
@@ -184,7 +188,7 @@ public:
         s.replace(j, s.length() - j, "");
         return s;
     }
-
+    //  HAM NAY DUNG CHO FILE TXT DE DOC PASS NHUNG KO CAN DAU ',', CACH DUNG NHU CU
     string GetPassword(int ID)
     {
         ifstream ifs(fileName);
@@ -195,9 +199,29 @@ public:
             ifs >> id;
             ifs >> pass;
             if (id == ID)
+            {
+                ifs.close();
                 return pass;
+            }
         }
+        ifs.close();
         return "";
+    }
+
+    void SetNewStudentsPass(string FileOfPass)
+    {
+        cvsFile ifs(FileOfPass);
+        string data = "";
+        for (int i = 0;; i++)
+        {
+            string s = this->GetLine(i,1);
+            if (s == "") break;
+            data.insert(data.length(), s);
+            data.push_back(' ');
+            data.push_back('0');
+            data.push_back('\n');
+        }
+        ifs.AddString(data);
     }
 };
 
