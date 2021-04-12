@@ -305,6 +305,35 @@ public:
         ofs << data;
         ofs.close();
     }
+    int UpdateYear()
+    {
+        cvsFile Year("PresentYear.txt", "D:/FinalProject");
+
+        ifstream ifs("D:/FinalProject/PresentYear.txt");
+        string s;
+        ifs >> s;
+        ifs.close();
+        if (s == "")
+            Year.AddString("2019");
+
+        fstream fs("D:/FinalProject/PresentYear.txt", ios::in);
+
+        int k;
+        fs >> k;
+
+        //                      ERROR ON NEW YEAR
+        if (k == 0)
+            k = 2019;
+        k++;
+
+        fs.close();
+        fs.open("D:/FinalProject/PresentYear.txt", ios::out);
+
+        fs << k;
+
+        fs.close();
+        return k;
+    }
 };
 
 class SignIn
