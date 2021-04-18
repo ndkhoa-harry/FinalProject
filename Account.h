@@ -1,7 +1,7 @@
-#include <iostream>
-#include <fstream>
+#ifndef _ACCOUNT_H_
+#define _ACCOUNT_H_
 
-using namespace std;
+#include "Helper.h"
 
 class Account {
 private:
@@ -15,41 +15,20 @@ public:
         this -> id = id;
         this -> pass = pass;
     }
-    
-    void setId(int id) { this -> id = id; }
 
     int getId() { return id; }
 
-    void setPass(string pass) { this -> pass = pass; }
-
     string getPass() { return pass; }
 
-    static Account findAccountFromFile(string fileName, int id) {
-        ifstream inp(fileName);
-
-        if (inp) {
-            int tmpId;
-            string tmpPass;
-
-            while (inp >> tmpId) {
-                inp >> tmpPass;
-
-                if (tmpId == id) {
-                    inp.close();
-
-                    return Account(id, tmpPass);
-                }
-            }
-
-            inp.close();
-        }
-
-        return Account(-1, NULL);
+    int getType() {
+        int res = id;
+        while (res > 9) res /= 10;
+        return res;
     }
-
-    void changePassword(string fileName, string newPass) {
-        ifstream inp(fileName);
-        ofstream out("Temporary.txt");
+    
+    void changePassword(string newPass) {
+        ifstream inp(ACCOUNTS_FILE);
+        ofstream out(ACCOUNTS_TEMPORARY_FILE);
 
         if (inp) {
             int tmpId;
@@ -64,11 +43,38 @@ public:
                     out << tmpId << ' ' << tmpPass << '\n';
             }
 
+            pass = newPass;
+
             out.close();
             inp.close();
 
-            remove ("Accounts.txt");
-            rename("Temporary.txt", "Accounts.txt");
+            remove(ACCOUNTS_FILE.c_str());
+            rename(ACCOUNTS_TEMPORARY_FILE.c_str(), ACCOUNTS_FILE.c_str());
         }
     }
+
+    static Account* findAccountFromFile(int id) {
+        ifstream inp(ACCOUNTS_FILE);
+
+        if (inp) {
+            int tmpId;
+            string tmpPass;
+
+            while (inp >> tmpId) {
+                inp >> tmpPass;
+
+                if (tmpId == id) {
+                    inp.close();
+
+                    return new Account(id, tmpPass);
+                }
+            }
+
+            inp.close();
+        }
+
+        return nullptr;
+    }
 };
+
+#endif

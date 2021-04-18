@@ -3,31 +3,31 @@
 
 #include <iostream>
 #include <string>
+#include "Account.h"
 
 using namespace std;
 
 class Person {
 private:
     int id;
-    string firstName, lastName, gender, dob;
+    string firstName, lastName, fullName, gender, dob;
 
 public:
     Person() { }
 
-    Person(int id, string firstName, string lastName, string gender, string dob) {
-        this->id = id;
-        this->firstName = firstName;
-        this->lastName = lastName;
-        this->gender = gender;
-        this->dob = dob;
+    Person(int id, string fullName) { 
+        this -> id = id;
+        this -> fullName = fullName;
     }
 
-    void display() {
-        cout << "ID: " << id << '\n';
-        cout << "Full name: " << lastName << " " << firstName << '\n';
-        cout << "Day of birth: " << dob << '\n';
-        cout << "Gender: " << gender << '\n';
-    }
+    Person(int id, string firstName, string lastName, string gender, string dob)
+        : Person(id, lastName + ' ' + firstName) {
+            this -> id = id;
+            this -> firstName = firstName;
+            this -> lastName = lastName;
+            this -> gender = gender;
+            this -> dob = dob;
+        }
 
     void setId(int id) { this -> id = id; }
 
@@ -41,6 +41,8 @@ public:
 
     string getLastName() { return lastName; }
 
+    string getFullName() { return fullName; }
+
     void setGender(string gender) { this -> gender = gender; }
 
     string getGender() { return gender; }
@@ -48,6 +50,13 @@ public:
     void setDob(char* dob) { this -> dob = dob; }
 
     string getDob() { return dob; }
+
+    void display() {
+        cout << "ID: " << id << '\n';
+        cout << "Full name: " << lastName << " " << firstName << '\n';
+        cout << "Day of birth: " << dob << '\n';
+        cout << "Gender: " << gender << '\n';
+    }
 }; 
 
 #endif

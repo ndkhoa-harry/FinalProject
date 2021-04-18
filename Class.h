@@ -1,41 +1,67 @@
-#include <iostream>
-#include <fstream>
-#include "Student.h"
+#ifndef _CLASS_H_
+#define _CLASS_H_
 
-using namespace std;
+#include "Helper.h"
+
+#include "Semester.h"
+#include "Course.h"
+#include "Student.h"
 
 class Class {
 private:
     struct Node {
-        Student data;
+        Student* data;
         Node* next;
     }; 
 
-    string name;
+    string name, schoolYearName;
     Node* head, *tail;
     int studentsCount;
 
+    bool alreadyInputted, dataModified;
+
 public:
-    Class() { }
-
-    Class(string name) {
-        this -> name = name; 
-
+    Class() { 
         head = nullptr;
         tail = nullptr;
         studentsCount = 0;
+
+        alreadyInputted = false;
+        dataModified = false;
     }
 
+    Class(string name) : Class() {
+        this -> name = name; 
+    }
+
+    Class(string name, string schoolYearName) : Class(name) {
+        this -> schoolYearName = schoolYearName;
+    } 
+
     ~Class() {
-        Node* cur = head;
-        while (cur) {
-            Node* tmp = cur;
-            cur = cur -> next;
+        cout << "Destructor " << name << '\n';
+
+        if (dataModified) putClassToFile();
+
+        while (head) {
+            Node* tmp = head;
+
+            head = head -> next;
+
+            delete tmp -> data;
             delete tmp;
         }
     }
 
-    void addStudent(Student student) {
+    void setName(string name) { this -> name = name; }
+
+    string getName() { return name; }
+
+    string getSchoolYearName() { return schoolYearName; }
+
+    bool isAlreadyInputted() { return alreadyInputted; }
+
+    void addStudent(Student* student) {
         if (!head) {
             head = new Node;
             tail = head;
@@ -50,42 +76,67 @@ public:
         studentsCount++;
     }
 
-    void inputFromCSV(string fileName) {
-        ifstream inp(fileName);
-
-        if (inp) {
-            string* data = new string[Student::componentsCount];
-
-            while (!inp.eof()) {
-                for (int i = 0; i < Student::componentsCount - 1; ++i) 
-                    getline(inp, data[i], ',');
-                getline(inp, data[Student::componentsCount - 1], '\n');
-
-                addStudent(
-                    Student(
-                        stoi(data[0]), 
-                        stoi(data[1]), 
-                        data[2], 
-                        data[3], 
-                        data[4], 
-                        data[5]
-                    )
-                );
-            }
-
-            delete[] data;
-
-            inp.close();
-        }
+    void inputNewStudents() {
+        // TODO: Input class by hand
     }
 
-    void display() {
-        cout << "This is class " << name << ":\n";
+    void getAllStudentsInfo(int &studentsCount, Student* *&students) {
+        // TODO: Get all students informations
+    }
 
-        Node* cur = head;
-        while (cur) {
-            cur -> data.display();
-            cur = cur -> next;
+    void displayClassScoreboard(Semester* lastedSemester) {
+        // TODO: Display class scoreboard
+    }
+
+    void displayMenu(Semester* lastedSemester) {
+        int choice;
+
+        cout << "This is class " << name << ":\n";
+        cout << "\t1. View class info\n";
+        cout << "\t2. View class score board\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            Node* cur = head;
+            while (cur) {
+                cout << '\t';
+                cur -> data -> display();
+                cur = cur -> next;
+            }
+        } else 
+            displayClassScoreboard(lastedSemester);
+    }
+
+    static Class* inputNewClass() {
+        int choice;
+
+        cout << "Add new class: \n";
+        cout << "\t1. Add manually\n";
+        cout << "\t2. Add from .csv file\n";
+        cout << "Enter your choice: "; cin >> choice;
+
+        string className;
+        cout << "Enter class name: "; cin >> className;
+
+        Class* newClass = new Class(className);
+
+        if (choice == 1) {
+            newClass -> inputNewStudents();
+        } else {
+            // TODO: Input new class from file
         }
+
+        return newClass;
+    }
+
+    void getClassFromFile() {
+        // TODO: Get class from file
+    }
+
+    void putClassToFile() {
+        // TODO: Put class informations to file
     }
 };
+
+#endif

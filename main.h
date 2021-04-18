@@ -1,14 +1,17 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include <iostream>
-#include <fstream>
+#include "Helper.h"
 
-#include "Staff.h"
-#include "Student.h"
-#include "Account.h"
+#include "School.h"
+#include "SchoolYear.h"
 #include "Class.h"
+#include "Student.h"
+#include "Semester.h"
+#include "Course.h"
 
-using namespace std;
+#include "Account.h"
+#include "StudentAccount.h"
+#include "StaffAccount.h"
 
 #endif
