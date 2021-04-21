@@ -81,13 +81,26 @@ public:
     }
 
     Course* getCourse(int id) {
-        // TODO: Get course from linked list
+         Node* cur = head;
 
-        return nullptr;
+        for(; id > 0; --id) cur = cur -> next;
+
+        if (!cur -> data -> isAlreadyInputted())
+            cur -> data -> inputCourseFromFile();
+
+        return cur -> data;
+        
     }
 
     Course* getCourseFromID(int id) {
-        // TODO: Get course from course ID
+        Node* cur = head;
+        
+        while (cur) {
+            if (cur -> data -> getID() == id)
+                return cur -> data;
+
+            cur = cur -> next;
+        }
 
         return nullptr;
     }
