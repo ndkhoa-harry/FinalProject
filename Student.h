@@ -103,6 +103,23 @@ public:
 
     void putDataToStream(ofstream &out) {
         // TODO: Put student data to stream
+        if (scored) {
+            out << no << ','
+                << getId() << ','
+                << getFullName() << ','
+                << totalMark << ','
+                << finalMark << ','
+                << midtermMark << ','
+                << otherMark << '\n';
+        }
+        else {
+            out << no << ','
+                << getId() << ','
+                << getFirstName() << ','
+                << getLastName() << ','
+                << getGender() << ','
+                << getDob() << '\n';
+        }
     }
 };
 
