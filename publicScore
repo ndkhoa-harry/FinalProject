@@ -1,0 +1,28 @@
+void publishScores(int courseID) {
+        ifstream inp(STUDENTS_FILE + to_string(getId()) + ".csv");
+
+        if (inp) {
+            ofstream out(STUDENTS_TEMPORARY_FILE);
+
+            string line;
+
+            getline(inp, line);
+            out << line << '\n';
+
+            getline(inp, line);
+            out << line << '\n';
+
+            while (getline(inp, line)) {
+                if (line.compare(to_string(courseID)) == 0)
+                    out << courseID << ',' << totalMark << ',' << finalMark << ',' << midtermMark << ',' << otherMark << '\n';
+                else
+                    out << line << '\n';
+            }
+
+            inp.close();
+            out.close();
+
+            remove((STUDENTS_FILE + to_string(getId()) + ".csv").c_str());
+            rename(STUDENTS_TEMPORARY_FILE.c_str(), (STUDENTS_FILE + to_string(getId()) + ".csv").c_str());
+        }
+    }
