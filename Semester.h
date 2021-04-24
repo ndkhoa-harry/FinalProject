@@ -106,15 +106,37 @@ public:
     }
 
     void getCoursesList(int &coursesCount, int* &id, string* &name) {
-        // TODO: Get courses list
+        coursesCount = this -> coursesCount;
+
+        id = new int[coursesCount];
+        name = new string[coursesCount];
+
+        Node* cur = head;
+        for (int i = 0; cur; ++i, cur = cur -> next) {
+            id[i] = cur -> data -> getID();
+            name[i] = cur -> data -> getCourseName();
+        }
     }
 
     void getAllCoursesInfo(int &coursesCount, Course* *&courses) {
-        // TODO: Get all courses informations
+        coursesCount = this -> coursesCount;
+        courses = new Course*[coursesCount];
+
+        Node* cur = head;
+        for (int i = 0; cur; ++i) {
+            courses[i] = cur -> data;
+
+            if (!courses[i] -> isAlreadyInputted()) 
+                courses[i] -> inputCourseFromFile();
+
+            cur = cur -> next;
+        }
     }
 
     void inputNewCourse() {
-        // TODO: Input new course by hand
+        addCourse(Course::inputNewCourse());
+
+        dataModified = true;
     }
 
     void displayCoursesMenu() {
