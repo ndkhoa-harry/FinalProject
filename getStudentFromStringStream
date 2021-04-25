@@ -1,0 +1,32 @@
+static Student* getStudentFromStringStream(stringstream &s) {
+        int componentsCount = 0;
+        string* data = new string[MAX_COMPONENTS];
+
+        while (getline(s, data[componentsCount], ',')) ++componentsCount;
+
+        Student* student = nullptr;
+        if (componentsCount == 6) {
+            student = new Student(
+                stoi(data[0]), 
+                stoi(data[1]), 
+                data[2], 
+                data[3], 
+                data[4], 
+                data[5]
+            );
+        } else {
+            student = new Student(
+                stoi(data[0]),
+                stoi(data[1]),
+                data[2],
+                stod(data[3]),
+                stod(data[4]),
+                stod(data[5]),
+                stod(data[6])
+            );
+        }
+        
+        delete[] data;
+
+        return student;
+    }
