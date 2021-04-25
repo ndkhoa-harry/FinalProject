@@ -191,15 +191,39 @@ public:
     }
 
     static Semester* inputNewSemester(int semesterOrder) {
-        // TODO: Input new semester by hand
+       string startDate, endDate;
+        cout << "Input new semester: \n";
+        cout << "\tStart date (dd/mm/yyyy): "; cin >> startDate;
+        cout << "\tEnd date (dd/mm/yyyy): "; cin >> endDate;
 
-        return nullptr;
+        return new Semester(SEMESTERS_NAMES[semesterOrder], startDate, endDate);
     }
 
     static Semester* getSemesterFromStringStream(stringstream &s, string semesterName) {
-        // TODO: Get semester from stringstream
+        string data, data2;
 
-        return nullptr;
+        Semester* semester = new Semester;
+            
+        semester -> setName(semesterName);
+
+        getline(s, data, ','); 
+        semester -> setStartDate(data);
+        
+        getline(s, data, ',');
+        semester -> setEndDate(data);
+
+        while (getline(s, data, ',')) {
+            getline(s, data2, ',');
+
+            semester -> addCourse(
+                new Course(
+                    stoi(data),
+                    data2
+                )
+            );
+        }
+
+        return semester;
     }
 };
 
