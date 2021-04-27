@@ -32,7 +32,34 @@ public:
     }
 
     static void importScoreBoard() {
-        // TODO: Import scoreboard from .csv file
+        int id;
+        string dir;
+
+        cout << "Import score board\n";
+        
+        cout << "Enter course ID: "; cin >> id;
+        cout << "Enter file .csv directory: "; cin >> dir;
+
+        string line;
+
+        ifstream inp(COURSES_FILE + to_string(id) + ".csv");
+        if (inp) {
+            getline(inp, line);
+            inp.close();
+        }
+
+        inp.open(dir); 
+        ofstream out(COURSES_FILE + to_string(id) + ".csv");
+        if (inp) {
+            out << line << '\n';
+            
+            out << "private\n";
+            while (getline(inp, line)) out << line << '\n';
+
+            inp.close();
+        }
+
+        out.close();
     }
 
     void displayMenu() {
