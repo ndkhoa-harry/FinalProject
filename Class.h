@@ -78,14 +78,28 @@ public:
 
     void inputNewStudents() {
         // TODO: Input class by hand
+        cout << "Enter students number: "; cin >> studentsCount;
+
+        for (int i = 0; i < studentsCount; ++i) 
+            addStudent(Student::inputNewStudent(i));
+
+        dataModified = true;
     }
 
     void getAllStudentsInfo(int &studentsCount, Student* *&students) {
         // TODO: Get all students informations
+        studentsCount = this -> studentsCount;
+        students = new Student*[studentsCount];
+
+        Node* cur = head;
+        for (int i = 0; cur; ++i) {
+            students[i] = cur -> data;
+            cur = cur -> next;
     }
 
     void displayClassScoreboard(Semester* lastedSemester) {
         // TODO: Display class scoreboard
+        
     }
 
     void displayMenu(Semester* lastedSemester) {
@@ -132,10 +146,34 @@ public:
 
     void getClassFromFile() {
         // TODO: Get class from file
+        ifstream inp(CLASSES_FILE + name + ".csv");
+
+        if (inp) {
+            string line;
+
+            while (getline(inp, line)) {
+                stringstream s(line);
+
+                addStudent(Student::getStudentFromStringStream(s));
+            }
+
+            alreadyInputted = true;
+
+            inp.close();
+        }
     }
 
     void putClassToFile() {
         // TODO: Put class informations to file
+         ofstream out(CLASSES_FILE + name + ".csv");
+
+        Node* cur = head;
+        while (cur) {
+            cur -> data -> putDataToStream(out);
+            cur = cur -> next;
+        }
+
+        out.close();
     }
 };
 
