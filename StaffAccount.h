@@ -113,6 +113,37 @@ public:
 
     void getStaffAccountFromFile() {
         // TODO: Get staff account from file
+         ifstream inp(STAFFS_FILE);
+
+        if (inp) {
+            string line;
+            string* data = new string[STAFF_COMPONENTS_COUNT];
+
+            while (!inp.eof()) {
+                getline(inp, data[0], ',');
+                if (stoi(data[0]) == account -> getId()) {
+                    for (int i = 1; i < STAFF_COMPONENTS_COUNT - 1; ++i) 
+                        getline(inp, data[i], ',');
+                    getline(inp, data[STAFF_COMPONENTS_COUNT - 1]);
+
+                    inp.close();
+
+                    staff = new Person(
+                        stoi(data[0]),
+                        data[1],
+                        data[2],
+                        data[3],
+                        data[4]
+                    );
+
+                    return;
+                } else 
+                    getline(inp, line);
+            }
+
+            delete[] data;
+
+            inp.close();
     }
 };
 
