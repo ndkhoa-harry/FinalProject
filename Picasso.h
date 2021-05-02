@@ -318,4 +318,38 @@ void drawBox(string title, int containsCount, string* contains, int optionsCount
     }
 }
 
+bool drawYesNoBox(string title, string message) {
+    const int containsCount = 3;
+    string contains[containsCount] = { 
+        "",
+        message,
+        "" 
+    };
+
+    const int optionsCount = 2;
+    string options[optionsCount] = { "No", "Yes" };
+
+    int choice = 1;
+
+    drawBox(title, containsCount, contains, optionsCount, options, choice);
+
+    return choice == 1;
+}
+
+void drawOkayBox(string title, string message) {
+    const int containsCount = 3;
+    string contains[containsCount] = { 
+        "",
+        message,
+        "" 
+    };
+
+    const int optionsCount = 1;
+    string options[optionsCount] = { "Okay" };
+
+    int choice = 0;
+
+    drawBox(title, containsCount, contains, optionsCount, options, choice);
+}
+
 #endif
