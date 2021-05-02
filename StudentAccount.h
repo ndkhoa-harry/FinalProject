@@ -64,6 +64,25 @@ public:
 
     void removeCourse(int id) {
         // TODO: Remove course from list
+         int id = -1;
+        for (int i = 0; i < enrolledCoursesCount; ++i)
+            if (enrolledCourses[i] -> getID() == courseID) {
+                id = i;
+                break;
+            }
+        if (id < 0) return;
+
+        if (!enrolledCourses[id] -> isAlreadyInputted())
+            enrolledCourses[id] -> inputCourseFromFile();
+
+        enrolledCourses[id] -> removeStudent(student -> getId());
+
+        for (int i = id; i < enrolledCoursesCount - 1; ++i) 
+            enrolledCourses[i] = enrolledCourses[i + 1];
+
+        --enrolledCoursesCount;
+
+        dataModified = true;
     }
 
     void enrolledCoursesMenu() {

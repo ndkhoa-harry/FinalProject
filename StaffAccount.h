@@ -7,7 +7,25 @@
 #include "Person.h"
 #include "School.h"
 
+const int STAFF_TITLE_LINES = 7;
+const string STAFF_TITLE[] = {
+    " __    __     ______     ______     _____     __         ______    ",
+    "/\\ \"-./  \\   /\\  __ \\   /\\  __ \\   /\\  __-.  /\\ \\       /\\  ___\\   ",
+    "\\ \\ \\-./\\ \\  \\ \\ \\/\\ \\  \\ \\ \\/\\ \\  \\ \\ \\/\\ \\ \\ \\ \\____  \\ \\  __\\   ",
+    " \\ \\_\\ \\ \\_\\  \\ \\_____\\  \\ \\_____\\  \\ \\____-  \\ \\_____\\  \\ \\_____\\ ",
+    "  \\/_/  \\/_/   \\/_____/   \\/_____/   \\/____/   \\/_____/   \\/_____/ ",
+    "",
+    "STAFF MENU"                                                        
+};
 
+const int STAFF_OPTIONS_COUNT = 5;
+const string STAFF_OPTIONS[] = {
+    "School",
+    "Import scoreboard",
+    "View profile information",
+    "Change password",
+    "Exit"
+};
 class StaffAccount {
 private:
     Person* staff;
