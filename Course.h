@@ -105,12 +105,36 @@ public:
 
     Student* findStudentFromID(int id) {
         // TODO: Find student from ID
+        Node* cur = head;
 
+        while (cur) {
+            cout << cur -> data -> getFullName() << '\n';
+            if (cur -> data -> getId() == id) 
+                return cur -> data;
+            cur = cur -> next;
         return nullptr;
     }
 
     void removeStudent(int id) {
         // TODO: Remove student from course
+         Node* cur = head, *tmp;
+
+        if (head -> data -> getId() == id) {
+            tmp = head;
+            head = head -> next;
+            delete tmp;
+        } else {
+            while (cur -> next -> data -> getId() != id)
+                cur = cur -> next;
+
+            tmp = cur -> next;
+            cur -> next = cur -> next -> next;
+            delete tmp;
+        }
+
+        --studentsCount;
+
+        dataModified = true;
     }
 
     void rearrangeNo() {
