@@ -117,6 +117,62 @@ public:
     
     void displayScoreboardFromFile() {
         // TODO: Display scoreboard from file
+             const int titleLines = 4;
+        string title[titleLines] = {
+            " ___  ___ ___  ___ ___ ___  ___   _   ___ ___  ",
+            "/ __|/ __/ _ \\| _ \\ __| _ )/ _ \\ /_\\ | _ \\   \\ ",
+            "\\__ \\ (_| (_) |   / _|| _ \\ (_) / _ \\|   / |) |",
+            "|___/\\___\\___/|_|_\\___|___/\\___/_/ \\_\\_|_\\___/ ",                                       
+        };
+
+        const int columnsCount = 7;
+        int columnsWidth[columnsCount] = { 4, 11, 13, 14, 14, 14, 14 };
+        string columnsName[columnsCount] = {
+            "No",
+            "Course ID",
+            "Course name",
+            "Total mark",
+            "Final mark",
+            "Midterm mark",
+            "Other mark"
+        };
+
+        const int rowsCount = enrolledCoursesCount;
+
+        string** table = new string* [rowsCount];
+
+        for (int i = 0; i < enrolledCoursesCount; ++i) {
+            Course* course = getEnrolledCourse(i);
+
+            table[i] = new string[columnsCount] {
+                    to_string(i + 1),
+                    to_string(course -> getID()),
+                    course -> getCourseName(),
+                    "x",
+                    "x",
+                    "x",
+                    "x"
+                };
+
+            if (course -> isPublished()) {
+                Student* student = course -> findStudentFromID(account -> getId());
+
+                table[i][3] = toStringPrecision(student -> getTotalMark());
+                table[i][4] = toStringPrecision(student -> getFinalMark());
+                table[i][5] = toStringPrecision(student -> getMidtermMark());
+                table[i][6] = toStringPrecision(student -> getOtherMark());
+            } 
+        }
+
+        system("cls");
+
+        int x = 3;
+        drawTitle(x, titleLines, title);
+        
+        ++x;
+        drawTable(x, "", columnsCount, columnsWidth, columnsName, rowsCount, table);
+
+        getch();
     }
 
     void displayMenu() {
