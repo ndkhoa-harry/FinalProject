@@ -517,4 +517,16 @@ bool drawInputBox(string title, int fieldLength, int inputsCount, string* instru
     }
 }
 
+bool drawInputBox(string title, int fieldLength, string instruction, string &inputData) {
+    string instructions[1] = { instruction };
+
+    string inputsData[1] = { inputData };
+
+    bool res = drawInputBox(title, fieldLength, 1, instructions, inputsData);
+
+    inputData = inputsData[0];
+    
+    return res;
+}
+
 #endif
