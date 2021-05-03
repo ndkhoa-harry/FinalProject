@@ -352,4 +352,169 @@ void drawOkayBox(string title, string message) {
     drawBox(title, containsCount, contains, optionsCount, options, choice);
 }
 
+bool drawInputBox(string title, int fieldLength, int inputsCount, string* instructions, string* inputsData) {
+    int width = title.size() + 4;
+
+    if (width < fieldLength + 4)
+        width = fieldLength + 4;
+
+    int optionsWidth = 12;
+
+    if (optionsWidth < (width - 3) / 2 + 1)
+        optionsWidth = (width - 3) / 2 + 1; 
+
+    if (width < optionsWidth * 2 + 3)
+        width = optionsWidth * 2 + 3;
+
+    int height = inputsCount + 6;
+
+    int startX = (WINDOW_HEIGHT - height) / 2 - 1;
+    int x = startX;
+
+    int startY = (WINDOW_WIDTH - width) / 2 - 1;
+
+    for (int i = x; i <= x + height - 1; ++i) {
+        gotoXY(i, startY);
+        for (int j = 0; j < width; ++j) cout << ' ';
+    }
+    gotoXY(WINDOW_HEIGHT - 1, 0);
+    cout << "                                                                    ";
+
+    gotoXY(x, startY);
+    cout << CHAR_UPPER_LEFT;
+    for (int i = 2; i < width; ++i)
+        cout << CHAR_HORIZONTAL;
+    cout << CHAR_UPPER_RIGHT;
+
+    ++x;
+    gotoXY(x, startY);
+    cout << CHAR_VERTICAL << ' ' << title;
+    gotoXY(x, startY + width - 1);
+    cout << CHAR_VERTICAL;
+
+    ++x;
+    gotoXY(x, startY);
+    cout << CHAR_VERTICAL_RIGHT;
+    for (int i = 2; i < width; ++i)
+        cout << CHAR_HORIZONTAL;
+    cout << CHAR_VERTICAL_LEFT;
+
+    for (int i = 0; i < inputsCount; ++i) {
+        ++x;
+        gotoXY(x, startY);
+        cout << CHAR_VERTICAL << ' ' << instructions[i] + inputsData[i];
+        gotoXY(x, startY + width - 1);
+        cout << CHAR_VERTICAL;
+    }
+
+    ++x;
+    gotoXY(x, startY);
+    cout << CHAR_VERTICAL_RIGHT;
+    for (int i = 2; i < width; ++i)
+        cout << CHAR_HORIZONTAL;
+    cout << CHAR_VERTICAL_LEFT;
+
+    gotoXY(x + 2, startY);
+    cout << CHAR_LOWER_LEFT;
+    for (int i = 2; i < width; ++i)
+        cout << CHAR_HORIZONTAL;
+    cout << CHAR_LOWER_RIGHT;
+
+    ++x;
+    int y = startY;
+
+    gotoXY(x, y);
+    cout << CHAR_VERTICAL;
+
+    ++y;
+    gotoXY(x, y + (optionsWidth - 6) / 2);
+    cout << "Cancel";
+
+    y += optionsWidth;
+    gotoXY(x - 1, y);
+    cout << CHAR_HORIZONTAL_DOWN;
+
+    gotoXY(x, y);
+    cout << CHAR_VERTICAL;
+
+    gotoXY(x + 1, y);
+    cout << CHAR_HORIZONTAL_UP;
+
+    ++y;
+    gotoXY(x, y + (optionsWidth - 2) / 2);
+    cout << "Okay";
+
+    y += optionsWidth;
+    gotoXY(x, y);
+    cout << CHAR_VERTICAL;
+
+    int choice = 1;
+    int curInput = 0;
+
+    while (1) {
+        gotoXY(x, startY + choice * optionsWidth + choice + 1 + (optionsWidth - 10) / 2);
+        cout << (choice == 0 ? "> Cancel <" : " > Okay < ");
+
+        y = startY + instructions[curInput].size() + inputsData[curInput].size() + 2;
+        gotoXY(startX + curInput + 3, y);
+
+        int c = getch();
+
+        switch (c) {
+            case KEY_ARROW: {
+                c = getch();
+
+                switch (c) {
+                    case KEY_RIGHT:
+                    case KEY_LEFT: 
+                        gotoXY(x, startY + choice * optionsWidth + choice + 1 + (optionsWidth - 10) / 2);
+                        cout << (choice == 0 ? "  Cancel  " : "   Okay   ");
+
+                        choice = (choice + 1) % 2;
+
+                        break;
+                    
+
+                    case KEY_DOWN: 
+                        curInput = (curInput + 1) % inputsCount;
+                        break;
+                    
+
+                    case KEY_UP: 
+                        curInput = (curInput + inputsCount - 1) % inputsCount;
+                        break;
+                }
+
+                break;
+            }
+            
+            case KEY_BACKSPACE:
+                if (inputsData[curInput].size() > 0) {
+                    gotoXY(startX + curInput + 3, y - 1);
+                    cout << ' ';
+
+                    inputsData[curInput].pop_back();
+                }
+
+                break;
+
+            case KEY_CONTROL_V: {
+                string clipboard = getClipboardData();
+
+                cout << clipboard;
+                inputsData[curInput] += clipboard;
+
+                break;
+            }
+
+            case KEY_ENTER:
+                return (choice == 1);
+
+            default: 
+                cout << char(c);
+                inputsData[curInput] += char(c);
+        }
+    }
+}
+
 #endif
