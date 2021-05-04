@@ -91,12 +91,31 @@ public:
     
     Class* getClass(int id) {
         // TODO: Get class from linked list
+        ClassNode* cur = classHead;
+        for (; id > 0; --id) cur = cur -> next;
 
-        return nullptr;
+           if (!cur -> data -> isAlreadyInputted())
+            cur -> data -> getClassFromFile();
+
+        return cur -> data;
     }
     
     void inputNewClass() {
         // TODO: Input new class by hand
+        Class* newClass = Class::inputNewClass(name);
+
+        if (newClass) {
+            addClass(newClass);
+            dataModified = true;
+
+            drawOkayBox("Message", "Input new class successfully");
+
+            newClass -> displayMenu(getLastedSemester());
+
+            return true;
+        }
+
+        return false;
     }
 
     void addSemester(Semester* semester) {
@@ -112,6 +131,7 @@ public:
 
     void inputNewSemester() {
         // TODO: Input new semester by hand
+        
     } 
 
     void displayClassesMenu(int s) {
