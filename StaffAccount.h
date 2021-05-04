@@ -26,6 +26,7 @@ const string STAFF_OPTIONS[] = {
     "Change password",
     "Exit"
 };
+
 class StaffAccount {
 private:
     Person* staff;
@@ -81,48 +82,39 @@ public:
     }
 
     void displayMenu() {
-        int choice;
+        int choice = 0;
+
         while (1) {
-            cout << "\t\tSTAFF MENU:\n";
-            cout << "\t1. School years\n";
-            cout << "\t2. Import scoreboard\n";
-            cout << "\t3. View profile info\n";
-            cout << "\t4. Change password\n";
-            cout << "\t0. Exit\n";
-            cout << "Enter your choice: ";
-            cin >> choice;
+            drawMenu(STAFF_TITLE_LINES, STAFF_TITLE, STAFF_OPTIONS_COUNT, STAFF_OPTIONS, choice);
 
             switch (choice) {
-                case 1: {
+                case 0: {
                     School school = School::getSchoolFromFile();
-                    
+
                     school.displayMenu();
                     break;
                 }
 
-                case 2: {
+                case 1: {
                     importScoreBoard();
-
+                    
                     break;
                 }
 
-                case 3: {
+                case 2: {
                     staff -> display();
 
                     break;
                 }
 
-                case 4: {
+                case 3: {
                     string pass;
 
                     cout << "Type your new password: ";
                     cin >> pass;
-
                     account -> changePassword(pass);
-
                     break;
                 }
-
                 default: 
                     return;
             }
