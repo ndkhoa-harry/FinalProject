@@ -98,6 +98,15 @@ public:
 
     void putSchoolToFile() {
         // TODO: Update school informations to file
+           ofstream out(SCHOOL_FILE);
+
+        Node* cur = head;
+        while (cur) {
+            out << cur -> data -> getName() << '\n';
+            cur = cur -> next;
+        }
+
+        out.close();
     }
 };
 
