@@ -125,13 +125,26 @@ public:
 
     Semester* getLastedSemester() {
         // TODO: Get last semester
-
-        return nullptr;
+        if (semestersCount == 0) return nullptr;
+        return semesters[semestersCount - 1];
     }
 
     void inputNewSemester() {
         // TODO: Input new semester by hand
-        
+        Semester* newSemester = Semester::inputNewSemester(semestersCount);
+
+        if (newSemester) {
+            addSemester(newSemester);
+            dataModified = true;
+
+            drawOkayBox("Message", "Input new semester successfully");
+
+            newSemester -> displayStaffMenu();
+
+            return true;
+        }
+
+        return false;
     } 
 
     void displayClassesMenu(int s) {
