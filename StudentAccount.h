@@ -8,6 +8,27 @@
 #include "Course.h"
 #include "Student.h"
 
+const int STUDENT_TITLE_LINES = 7;
+const string STUDENT_TITLE[] = {
+    " __    __     ______     ______     _____     __         ______    ",
+    "/\\ \"-./  \\   /\\  __ \\   /\\  __ \\   /\\  __-.  /\\ \\       /\\  ___\\   ",
+    "\\ \\ \\-./\\ \\  \\ \\ \\/\\ \\  \\ \\ \\/\\ \\  \\ \\ \\/\\ \\ \\ \\ \\____  \\ \\  __\\   ",
+    " \\ \\_\\ \\ \\_\\  \\ \\_____\\  \\ \\_____\\  \\ \\____-  \\ \\_____\\  \\ \\_____\\ ",
+    "  \\/_/  \\/_/   \\/_____/   \\/_____/   \\/____/   \\/_____/   \\/_____/ ",
+    "",
+    "STUDENT MENU"  
+};
+
+const int STUDENT_OPTIONS_COUNT = 6;
+const string STUDENT_OPTIONS[] = {
+    "Current semester courses",
+    "Enrolled courses",
+    "View my scoreboard",
+    "View my infomation",
+    "Change password",
+    "Exit"
+};
+
 class StudentAccount {
 private:
     Student* student;
@@ -85,7 +106,7 @@ public:
         dataModified = true;
     }
 
-    void enrolledCoursesMenu() {
+    void enrolledCoursesTable() {
         int choice;
 
         while (1) {
@@ -174,56 +195,38 @@ public:
 
         getch();
     }
+    
+    void displayMyInformation() {
+        // TODO: Display student in formation
+    }
 
     void displayMenu() {
-        int choice;
+        int choice = 0;
+
         while (1) {
-            cout << "\t\tSTUDENT MENU\n";
-            cout << "\t1. Courses\n";
-            cout << "\t2. Enrolled courses\n";
-            cout << "\t3. View my scoreboard\n";
-            cout << "\t4. View profile info\n";
-            cout << "\t5. Change password\n";
-            cout << "\t0. Exit\n";
-            cout << "Enter your choice: ";
-            cin >> choice;
+            drawMenu(STUDENT_TITLE_LINES, STUDENT_TITLE, STUDENT_OPTIONS_COUNT, STUDENT_OPTIONS, choice);
 
             switch (choice) {
-                case 1: {
+                case 0: 
                     dataModified |= semester -> displayStudentMenu(student, enrolledCourses, enrolledCoursesCount);
-
                     break;
-                }
-
-                case 2: {
-                    enrolledCoursesMenu();
-
+                
+                case 1: 
+                    enrolledCoursesTable();
                     break;
-                }
 
-                case 3: {
+                case 2: 
                     displayScoreboardFromFile();
-
                     break;
-                }
-
-                case 4: {
-                    student -> display();
-
+            
+                case 3: 
+                    displayMyInformation();
                     break;
-                }
-
-                case 5: {
-                    string pass;
-
-                    cout << "Type your new password: ";
-                    cin >> pass;
-
-                    account -> changePassword(pass);
-
+                
+                case 4: 
+                    account -> displayChangePasswordBox();
                     break;
-                }
-
+                
                 default: 
                     return;
             }
