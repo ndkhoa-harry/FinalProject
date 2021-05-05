@@ -44,6 +44,10 @@ public:
     
     void inputScore() {
         // TODO: Input scores by hand
+        cout << "Enter total mark: "; cin >> totalMark;
+        cout << "Enter final mark: "; cin >> finalMark;
+        cout << "Enter midterm mark: "; cin >> midtermMark;
+        cout << "Enther other mark: "; cin >> otherMark;
     }
 
     void publishScores(int courseID) {
