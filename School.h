@@ -66,6 +66,18 @@ public:
 
     void inputNewSchoolYear() {
         // TODO: Input new school year by hand
+        if (!head) {
+            head = new Node;
+            tail = head;
+        } else {
+            tail -> next = new Node;
+            tail = tail -> next;
+        }
+
+        tail -> data = schoolYear;
+        tail -> next = nullptr;
+
+        ++schoolYearsCount;
     }
     
     void displayMenu() {
