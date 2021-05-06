@@ -193,8 +193,15 @@ public:
 
     static SchoolYear* inputNewSchoolYear() {
         // TODO: Input new school year by hand
+            string newName = 
+            to_string(CURRENT_DATE.getYear()) 
+            + "-" + 
+            to_string(CURRENT_DATE.getYear() + 1);
 
-        return nullptr;
+        if (drawYesNoBox("Create new school year", "Do you really want to create school year " + newName + " ?")) 
+            return new SchoolYear(newName);
+        else
+            return nullptr;
     }
 
     void getSchoolYearFromFile() {
@@ -227,6 +234,24 @@ public:
 
     static Semester* getLastedSemesterFromFile(string schoolYearName) {
         // TODO: Get lasted semester from file
+      ifstream inp(SCHOOL_YEARS_FILE + schoolYearName + ".csv");
+
+        if (inp) {
+            int semestersCount = 0;
+            string line, tmpLine;
+
+            getline(inp, line);
+
+            for (; getline(inp, tmpLine); ++semestersCount)
+                line = tmpLine;
+
+            inp.close();
+
+            if (semestersCount == 0) return nullptr;
+
+            stringstream s(line);
+            return Semester::getSemesterFromStringStream(s, SEMESTERS_NAMES[semestersCount - 1]);
+        }
 
         return nullptr;
     }
