@@ -148,43 +148,73 @@ public:
     }
 
     bool displayStaffMenu() {
-        int choice;
+        const int titleLines = 5;
+        string title[titleLines] = {
+            name + " SEMESTER",
+            "  ___ ___  _   _ ___  ___ ___ ___ ",
+            " / __/ _ \\| | | | _ \\/ __| __/ __|",
+            "| (_| (_) | |_| |   /\\__ \\ _|\\__ \\",
+            " \\___\\___/ \\___/|_|_\\|___/___|___/"
+        };
+
+        const int optionsCount = coursesCount + (coursesCount < 5);
+        string* options = new string[optionsCount];
+
+        Node* cur = head;
+        for (int i = 0; cur; ++i, cur = cur -> next)
+            options[i] = cur -> data -> getCourseName();
+        if (coursesCount < 5)
+            options[coursesCount] = "Create new course";
+
+        int choice = 0;
 
         while (1) {
-            displayCoursesMenu();
+            drawMenu(titleLines, title, optionsCount, options, choice);
 
-            cout << '\t' << coursesCount + 1 << ". Create course\n"; 
-
-            cout << "Enter your choice: "; cin >> choice;
-            --choice;
-
-            if (choice < coursesCount) {
+            if (0 <= choice && choice < coursesCount) {
                 Course* course = getCourse(choice);
 
                 course -> displayStaffCourse();
             } else if (choice == coursesCount) {
                 inputNewCourse();
             } else {
+                delete[] options;
+
                 return dataModified;
             }
         }
     }
 
     bool displayStudentMenu(Student* student, Course* *enrolledCourses, int &enrolledCoursesCount) {
-        int choice;
+        const int titleLines = 5;
+        string title[titleLines] = {
+            name + " SEMESTER",
+            "  ___ ___  _   _ ___  ___ ___ ___ ",
+            " / __/ _ \\| | | | _ \\/ __| __/ __|",
+            "| (_| (_) | |_| |   /\\__ \\ _|\\__ \\",
+            " \\___\\___/ \\___/|_|_\\|___/___|___/"
+        };
+
+        const int optionsCount = coursesCount;
+        string* options = new string[optionsCount];
+
+        Node* cur = head;
+        for (int i = 0; cur; ++i, cur = cur -> next)
+            options[i] = cur -> data -> getCourseName();
+
+        int choice = 0;
         bool enrolled = false;
 
         while (1) {
-            displayCoursesMenu();
+            drawMenu(titleLines, title, optionsCount, options, choice);
 
-            cout << "Enter your choice: "; cin >> choice;
-            --choice;
-
-            if (choice < coursesCount) {
+            if (0 <= choice && choice < coursesCount) {
                 Course* course = getCourse(choice);
 
-                enrolled |= course -> displayStudentCourse(student, enrolledCourses, enrolledCoursesCount);
+                enrolled |= course -> displayStudentCourse(student, enrolledCoursesCount, enrolledCourses);
             } else {
+                delete[] options;
+
                 return enrolled;
             }
         }
