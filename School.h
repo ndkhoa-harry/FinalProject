@@ -60,8 +60,15 @@ public:
 
     SchoolYear* getSchoolYear(int id) {
         // TODO: Get school year in linked list
+        Node* cur = head;
 
-        return nullptr;
+        for (; id > 0; --id) cur = cur -> next;
+
+        if (!cur -> data -> isAlreadyInputted())
+            cur -> data -> getSchoolYearFromFile();
+
+        return cur -> data;
+        
     }
 
     void inputNewSchoolYear() {
@@ -106,6 +113,21 @@ public:
 
     static School getSchoolFromFile() {
         // TODO: Get all school years from file
+        ifstream inp(SCHOOL_FILE);
+        School school;
+
+        if (inp) {
+            string schoolYearName;
+
+            while (inp >> schoolYearName) {
+                SchoolYear* schoolYear = new SchoolYear(schoolYearName);
+                school.addSchoolYear(schoolYear);
+            }
+        }
+
+        inp.close();
+
+        return school;
     }
 
     void putSchoolToFile() {
