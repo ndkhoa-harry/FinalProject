@@ -148,11 +148,49 @@ public:
     } 
 
     void displayClassesMenu(int s) {
-        cout << "This is list of Classes: \n";
+        const int titleLines = 5;
+        string title[titleLines] = {
+            name,                    
+            "  ___ _      _   ___ ___ ___ ___ ",
+            " / __| |    /_\\ / __/ __| __/ __|",
+            "| (__| |__ / _ \\\\__ \\__ \\ _|\\__ \\",
+            " \\___|____/_/ \\_\\___/___/___|___/"                   
+        };
+
+        int optionsCount = classesCount + 1;
+
+        string* options = new string[optionsCount];
         ClassNode* cur = classHead;     
         for (int i = 0; cur; ++i, cur = cur -> next)
-            cout << '\t' << s + i << ". Class " << cur -> data -> getName() << '\n';
-        cout << '\t' << s + classesCount + 1 << ". Create class\n";
+            options[i] = "Class " + cur -> data -> getName();
+        options[optionsCount - 1] = "Create new class";
+
+        int choice = 0;
+
+        while (1) {  
+            drawMenu(titleLines, title, optionsCount, options, choice);
+
+            if (0 <= choice && choice < classesCount) {
+                Class* curClass = getClass(choice);
+
+                curClass -> displayMenu(getLastedSemester());
+            } else if (choice == classesCount) {
+                if (inputNewClass()) {
+                    ++optionsCount;
+
+                    delete[] options;
+                    options = new string[optionsCount];
+
+                    ClassNode* cur = classHead;     
+                    for (int i = 0; cur; ++i, cur = cur -> next)
+                        options[i] = "Class " + cur -> data -> getName();
+                    options[optionsCount - 1] = "Create new class";
+                }
+            } else {
+                delete[] options;
+                return;
+            }
+        }
     }
 
     void displaySemestersMenu(int s) {
