@@ -6,6 +6,16 @@
 #include "Class.h"
 #include "Semester.h"
 
+/// SCHOOL YEAR MENU
+const int SCHOOL_YEAR_TITLE_LINES = 0;
+const string SCHOOL_YEAR_TITLE[] = { "" };
+
+const int SCHOOL_YEAR_OPTIONS_COUNT = 2;
+const string SCHOOL_YEAR_OPTIONS[] = {
+    "CLASSES",
+    "SEMESTERS"
+};
+
 class SchoolYear {
 private:
     string name;
@@ -202,29 +212,20 @@ public:
     }
 
     void displayMenu() {
-        int choice;
+        int choice = 0;
+
         while (1) {
-            cout << "\tThis is school year " << name << '\n';
+            drawMenu(SCHOOL_YEAR_TITLE_LINES, SCHOOL_YEAR_TITLE, SCHOOL_YEAR_OPTIONS_COUNT, SCHOOL_YEAR_OPTIONS, choice);
 
-            displayClassesMenu(1);
-
-            displaySemestersMenu(classesCount + 2);
-
-            cout << "Enter your choice: "; cin >> choice;
-            --choice;
-
-            if (choice < classesCount) {
-                Class* curClass = getClass(choice);
-
-                curClass -> displayMenu(getLastedSemester());
-            } else if (choice == classesCount) {
-                inputNewClass();
-            } else if (choice < classesCount + semestersCount + 1) {
-                dataModified |= semesters[choice - classesCount - 1] -> displayStaffMenu();
-            } else if (choice == classesCount + semestersCount + 1) {
-                inputNewSemester();
-            } else {
-                return;
+            switch (choice) {
+                case 0:
+                    displayClassesMenu();
+                    break;
+                case 1:
+                    displaySemestersMenu(classesCount + 2);
+                    break;
+                default:
+                    return;
             }
         }
     }
