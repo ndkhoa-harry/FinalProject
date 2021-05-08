@@ -198,6 +198,22 @@ public:
     
     void displayMyInformation() {
         // TODO: Display student in formation
+         string title = "Self information";
+
+        const int containsCount = 5;
+        string contains[containsCount] = {
+            "SID: " + to_string(student -> getId()),
+            "Class: " + className,
+            "Full name: " + student -> getFullName(),
+            "Gender: " + student -> getGender(),
+            "Date of Birth: " + student -> getDob()
+        };
+
+        const int optionsCount = 1;
+        string options[optionsCount] = { "OK" };
+
+        int choice = 0;
+        drawBox(title, containsCount, contains, optionsCount, options, choice);
     }
 
     void displayMenu() {
