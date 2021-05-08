@@ -246,10 +246,50 @@ public:
 
     void putCourseToFile() {
         // TODO: Update course informations to file
+         ofstream out(COURSES_FILE + to_string(id) + ".csv");
+
+        out << id << ',';
+        out << courseName << ',';
+        out << teacherName << ',';
+        out << credits << ',';
+        out << maxStudents << ',';
+        out << session1 << ',';
+        out << session2 << ',';
+        out << startDate << ',';
+        out << endDate << '\n';
+
+        if (scored) {
+            if (scoreboardPublished)
+                out << "public\n";
+            else
+                out << "private\n";
+        }
+
+        Node* cur = head;
+        while (cur) {
+            cur -> data -> putDataToStream(out);
+            cur = cur -> next;
+        };
+
+        out.close();
     }
 
     void exportToCSV(string dir) {
         // TODO: Export to .csv file
+          ofstream out(dir + '/' + to_string(id) + '_' + courseName + ".csv");
+
+        Node* cur = head;
+        while (cur) {
+            Student* student = cur -> data;
+
+            out << student -> getNo() << ',';
+            out << student -> getId() << ',';
+            out << student -> getFullName() << '\n';
+
+            cur = cur -> next;
+        }
+
+        out.close();
     }
 };
 
