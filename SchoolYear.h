@@ -204,11 +204,47 @@ public:
     }
 
     void displaySemestersMenu(int s) {
-        cout << "This is list of semesters: \n";
-        for (int i = 0; i < semestersCount; ++i) 
-            cout << '\t' << s + i << ". Semester " << semesters[i] -> getName() << '\n';
+        const int titleLines = 5;
+        string title[titleLines] = {
+            name,
+            " ___ ___ __  __ ___ ___ _____ ___ ___  ___ ",
+            "/ __| __|  \\/  | __/ __|_   _| __| _ \\/ __|",
+            "\\__ \\ _|| |\\/| | _|\\__ \\ | | | _||   /\\__ \\",
+            "|___/___|_|  |_|___|___/ |_| |___|_|_\\|___/"
+        };
+
+        int optionsCount = semestersCount + (semestersCount < 3);
+
+        string* options = new string[optionsCount];
+        for (int i = 0; i < semestersCount; ++i)
+            options[i] = semesters[i] -> getName() + " semester";
         if (semestersCount < 3)
-            cout << '\t' << s + semestersCount + 1 << ". Create semester\n";
+            options[semestersCount] = "Create new semester";
+
+        int choice = 0;
+
+        while (1) {
+            drawMenu(titleLines, title, optionsCount, options, choice);
+
+            if (0 <= choice && choice < semestersCount)
+                dataModified |= semesters[choice] -> displayStaffMenu();
+            else if (choice == semestersCount) {
+                if (inputNewSemester()) {
+                    ++optionsCount;
+                
+                    delete[] options;
+                    options = new string[optionsCount];
+
+                    for (int i = 0; i < semestersCount; ++i)
+                        options[i] = semesters[i] -> getName() + " semester";
+                    if (semestersCount < 3)
+                        options[semestersCount] = "Create new semester";
+                }
+            } else {
+                delete[] options;
+                return;
+            }
+        }
     }
 
     void displayMenu() {
