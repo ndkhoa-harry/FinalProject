@@ -221,12 +221,23 @@ public:
     }
 
     static Semester* inputNewSemester(int semesterOrder) {
-       string startDate, endDate;
-        cout << "Input new semester: \n";
-        cout << "\tStart date (dd/mm/yyyy): "; cin >> startDate;
-        cout << "\tEnd date (dd/mm/yyyy): "; cin >> endDate;
+        string title = "Input new semester";
 
-        return new Semester(SEMESTERS_NAMES[semesterOrder], startDate, endDate);
+        int fieldLength = 50;
+
+        const int inputsCount = 2;
+
+        string instructions[inputsCount] = {
+            "Start date (dd/mm/yyyy): ",
+            "End date (dd/mm/yyyy): "
+        };
+
+        string inputsData[inputsCount] = { "", "" };
+
+        if (drawInputBox(title, fieldLength, inputsCount, instructions, inputsData)) 
+            return new Semester(SEMESTERS_NAMES[semesterOrder], inputsData[0], inputsData[1]);
+        else
+            return nullptr;
     }
 
     static Semester* getSemesterFromStringStream(stringstream &s, string semesterName) {
