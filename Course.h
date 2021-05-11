@@ -159,43 +159,128 @@ public:
     void displayStaffCourse() {
         displayCourse();
 
-        cout << "List of students:\n";
-        
-        Node* cur = head;
-        while (cur) {
-            cur -> data -> display();
-            cur = cur -> next;
-        }
-
-        int choice;
         if (scored) {
-            if (scoreboardPublished)
-                cout << "This scoreboard has been published!!!\n";
-            else {
+            string title = "COURSE " + courseName + " SCOREBOARD";
+
+            const int columnsCount = 7;
+            int columnsWidth[columnsCount] = { 5, 10, 30, 14, 14, 14, 14 };
+            string columnsName[columnsCount] = {
+                "No",
+                "Student ID",
+                "Full name",
+                "Total mark",
+                "Final mark",
+                "Midterm mark",
+                "Other mark"
+            };
+
+            int rowsCount = studentsCount;
+
+            string** table = new string* [rowsCount];
+
+            Node* cur = head;
+            for (int i = 0; cur; ++i, cur = cur -> next) {
+                Student* student = cur -> data;
+
+                table[i] = new string[columnsCount] {
+                    to_string(student -> getNo()),
+                    to_string(student -> getId()),
+                    student -> getFullName(),
+                    toStringPrecision(student -> getTotalMark()),
+                    toStringPrecision(student -> getFinalMark()),
+                    toStringPrecision(student -> getMidtermMark()),
+                    toStringPrecision(student -> getOtherMark())
+                };
+            }
+
+            drawTable(12, title, columnsCount, columnsWidth, columnsName, rowsCount, table);
+            cout << "\n\n";
+
+            for (int i = 0; i < rowsCount; ++i) delete[] table[i];
+            delete[] table;
+
+            if (scoreboardPublished) {
+                cout << "This scoreboard has been published!!\n";
+                cout << "Press any key to continue\n";
+
+                char c = getch();
+            } else {
                 cout << "Press (1) to update a student result\n";
                 cout << "Press (2) to publish scoreboard\n";
-                cin >> choice;
+                
+                char c = getch();
 
-                if (choice == 1) {
-                    int id;
-                    cout << "Enter student ID: "; cin >> id;
+                if (c == '1') {
+                    string sID = "";
+                    if (drawInputBox("Update student result", 35, "Enter student ID: ", sID)) {
+                        int id = stoi(sID);
 
-                    // TODO: Update student scores
-                } else if (choice == 2) {
-                    publishScoreboard();
-                }
+                        Student* student = findStudentFromID(id); 
+                        
+                        if (student -> inputScore()) {
+                            drawOkayBox("Message", "Update student result successfully!");
+                            dataModified = true;
+                        } 
+                    } 
+                } else if (c == '2') {
+                    if (drawYesNoBox("Publish scoreboard", "Do you really want to publish scoreboard?"))
+                        publishScoreboard();
+                } else
+                    return;
+
+                displayStaffCourse();
             }
         } else {
-            cout << "Press (1) to Export this course to .csv file: ";
-            cin >> choice;
+            string title = "LIST OF ENROLLED STUDENTS";
 
-            if (choice == 1) {
-                string dir;
-                cout << "Enter the directory you want to store your file: ";
-                cin >> dir;
+            const int columnsCount = 6;
+            int columnsWidth[columnsCount] = { 10, 15, 25, 15, 15, 25 };
+            string columnsName[columnsCount] = {
+                "No",
+                "Student ID",
+                "Last name",
+                "First name",
+                "Gender",
+                "Date of birth"
+            };
 
-                exportToCSV(dir);
+            int rowsCount = studentsCount;
+
+            string** table = new string* [rowsCount];
+
+            Node* cur = head;
+            for (int i = 0; cur; ++i, cur = cur -> next) {
+                Student* student = cur -> data;
+
+                table[i] = new string[columnsCount] {
+                    to_string(student -> getNo()),
+                    to_string(student -> getId()),
+                    student -> getLastName(),
+                    student -> getFirstName(),
+                    student -> getGender(),
+                    student -> getDob()
+                };
             }
+
+            drawTable(12, title, columnsCount, columnsWidth, columnsName, rowsCount, table);
+            cout << "\n\n";
+
+            for (int i = 0; i < rowsCount; ++i) delete[] table[i];
+            delete[] table;
+
+            cout << "Press (1) to Export this course to .csv file\n";
+            char choice = getch();
+
+            if (choice == '1') {
+                string dir;
+                if (drawInputBox("Export course", 100, "Enter the directory you want to store Course.csv file: ", dir)) {
+                    exportToCSV(dir);
+
+                    drawOkayBox("Message", "Export successfully!");
+                } else
+                    displayStaffCourse();
+            } else 
+                return;
         }
     }
 
