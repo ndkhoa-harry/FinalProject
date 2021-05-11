@@ -52,7 +52,36 @@ public:
             rename(ACCOUNTS_TEMPORARY_FILE.c_str(), ACCOUNTS_FILE.c_str());
         }
     }
+    void displayChangePasswordBox() {
+        string title = "Change password";
 
+        int fieldLength = 40;
+
+        const int inputsCount = 2;
+        string instructions[inputsCount] = {
+            "Old password: ",
+            "New password: "
+        };
+
+        string* inputsData = new string[inputsCount] { "", "" };
+
+        while (1) {
+            if (!drawInputBox(title, fieldLength, inputsCount, instructions, inputsData))
+                return;
+
+            if (inputsData[0].compare(pass) == 0) {
+                if (inputsData[1].size() > 0) {
+                    changePassword(inputsData[1]);
+
+                    drawOkayBox("Note", "Change password successfully");
+
+                    return;
+                } else
+                    drawOkayBox("Error!!!", "New password can't be empty!");
+            } else
+                drawOkayBox("Error!!!", "Old password incorrect!");
+        }
+    }
     static Account* findAccountFromFile(int id) {
         ifstream inp(ACCOUNTS_FILE);
 
