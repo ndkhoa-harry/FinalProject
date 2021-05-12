@@ -82,6 +82,11 @@ public:
                 drawOkayBox("Error!!!", "Old password incorrect!");
         }
     }
+    static void addNewAccount(int id, string pass) {
+        ofstream out(ACCOUNTS_FILE, ios::app);
+        out << id << ' ' << pass << '\n';
+        out.close();
+    }
     static Account* findAccountFromFile(int id) {
         ifstream inp(ACCOUNTS_FILE);
 
