@@ -50,35 +50,78 @@ public:
         if (account) delete account;
     }
 
-    static void importScoreBoard() {
-        int id;
-        string dir;
+    void importScoreBoard() {
+        string title = "Import score board";
 
-        cout << "Import score board\n";
-        
-        cout << "Enter course ID: "; cin >> id;
-        cout << "Enter file .csv directory: "; cin >> dir;
+        int fieldLength = 100;
 
-        string line;
+        const int inputsCount = 2;
 
-        ifstream inp(COURSES_FILE + to_string(id) + ".csv");
-        if (inp) {
-            getline(inp, line);
-            inp.close();
+        string instructions[inputsCount] = {
+            "Enter course ID: ",
+            "Enter file Score.CSV directory: "
+        };
+
+        string inputsData[inputsCount] = { "", "" };
+
+        if (drawInputBox(title, fieldLength, inputsCount, instructions, inputsData)) {
+            int id = stoi(inputsData[0]);
+            string dir = inputsData[1];
+
+            ifstream inp(COURSES_FILE + to_string(id) + ".csv");
+
+            string line;
+            if (inp) {
+                getline(inp, line);
+                inp.close();
+            }
+
+            inp.open(dir); 
+
+            if (inp) {
+                ofstream out(COURSES_FILE + to_string(id) + ".csv");
+
+                out << line << '\n';
+
+                out << "private\n";
+                while (getline(inp, line)) out << line << '\n';
+
+                inp.close();
+                out.close();
+
+                updateStudentsOverallGPA(id);
+
+                drawOkayBox("Message", "Import scoreboard successfully!");
+            } else
+                drawOkayBox("Error!!!", "Can't open file, please check your directory!");
         }
+    }
 
-        inp.open(dir); 
-        ofstream out(COURSES_FILE + to_string(id) + ".csv");
-        if (inp) {
-            out << line << '\n';
-            
-            out << "private\n";
-            while (getline(inp, line)) out << line << '\n';
+    void updateStudentsOverallGPA(int id) {
+        Course* course = new Course(id);
 
-            inp.close();
-        }
+        course -> inputCourseFromFile();
+        course -> updateStudentsOverallGPA();
 
-        out.close();
+        delete course;
+    }
+
+    void displayMyInformation() {
+        string title = "Self information";
+
+        const int containsCount = 4;
+        string contains[containsCount] = {
+            "SID: " + to_string(staff -> getId()),
+            "Full name: " + staff -> getFullName(),
+            "Gender: " + staff -> getGender(),
+            "Date of Birth: " + staff -> getDob()
+        };
+
+        const int optionsCount = 1;
+        string options[optionsCount] = { "OK" };
+
+        int choice = 0;
+        drawBox(title, containsCount, contains, optionsCount, options, choice);
     }
 
     void displayMenu() {
@@ -90,31 +133,22 @@ public:
             switch (choice) {
                 case 0: {
                     School school = School::getSchoolFromFile();
-
                     school.displayMenu();
                     break;
                 }
 
-                case 1: {
+                case 1: 
                     importScoreBoard();
-                    
                     break;
-                }
 
-                case 2: {
-                    staff -> display();
-
+                case 2: 
+                    displayMyInformation();
                     break;
-                }
 
-                case 3: {
-                    string pass;
-
-                    cout << "Type your new password: ";
-                    cin >> pass;
-                    account -> changePassword(pass);
+                case 3: 
+                    account -> displayChangePasswordBox();
                     break;
-                }
+
                 default: 
                     return;
             }
@@ -122,8 +156,7 @@ public:
     }
 
     void getStaffAccountFromFile() {
-        // TODO: Get staff account from file
-         ifstream inp(STAFFS_FILE);
+        ifstream inp(STAFFS_FILE);
 
         if (inp) {
             string line;
@@ -131,6 +164,7 @@ public:
 
             while (!inp.eof()) {
                 getline(inp, data[0], ',');
+
                 if (stoi(data[0]) == account -> getId()) {
                     for (int i = 1; i < STAFF_COMPONENTS_COUNT - 1; ++i) 
                         getline(inp, data[i], ',');
@@ -154,6 +188,7 @@ public:
             delete[] data;
 
             inp.close();
+        }
     }
 };
 
