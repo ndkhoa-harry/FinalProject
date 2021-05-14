@@ -25,7 +25,42 @@ public:
         while (res > 9) res /= 10;
         return res;
     }
-    
+
+    static Account* displayLoginBox() {
+        string title = "LOGIN";
+
+        int fieldLength = 50;
+
+        const int inputsCount = 2;
+        string instructions[inputsCount] = {
+            "Student/Staff ID: ",
+            "Password: "
+        };
+
+        string* inputsData = new string[inputsCount] { "", "" };
+
+        Account* account = nullptr;
+        while (1) {
+            system("cls");
+
+            if (drawInputBox(title, fieldLength, inputsCount, instructions, inputsData)) {
+                if (inputsData[0].empty())
+                    drawOkayBox("Error!", "Empty ID!!!");
+                else {
+                    account = findAccountFromFile(stoi(inputsData[0]));
+
+                    if (!account) 
+                        drawOkayBox("Error!", "Incorrect ID!!!");
+                    else if (account -> getPass().compare(inputsData[1]) != 0)
+                        drawOkayBox("Error!", "Incorrect Password!!!");
+                    else 
+                        return account;
+                }
+            } else
+                return nullptr;
+        }
+    }
+
     void changePassword(string newPass) {
         ifstream inp(ACCOUNTS_FILE);
         ofstream out(ACCOUNTS_TEMPORARY_FILE);
@@ -52,6 +87,7 @@ public:
             rename(ACCOUNTS_TEMPORARY_FILE.c_str(), ACCOUNTS_FILE.c_str());
         }
     }
+    
     void displayChangePasswordBox() {
         string title = "Change password";
 
@@ -82,11 +118,13 @@ public:
                 drawOkayBox("Error!!!", "Old password incorrect!");
         }
     }
+
     static void addNewAccount(int id, string pass) {
         ofstream out(ACCOUNTS_FILE, ios::app);
         out << id << ' ' << pass << '\n';
         out.close();
     }
+
     static Account* findAccountFromFile(int id) {
         ifstream inp(ACCOUNTS_FILE);
 
