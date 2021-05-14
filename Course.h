@@ -139,6 +139,11 @@ public:
 
     void rearrangeNo() {
         // TODO: Rearrange no of all students
+         Node* cur = head;
+        for (int i = 1; cur; ++i) {
+            cur -> data -> setNo(i);
+            cur = cur -> next;
+        } 
     }
 
     void publishScoreboard() {
