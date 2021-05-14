@@ -148,6 +148,14 @@ public:
 
     void publishScoreboard() {
         // TODO: Publish scoreboard
+         Node* cur = head;
+        while (cur) {
+            cur -> data -> publishScores(id);
+            cur = cur -> next;
+        }
+
+        scoreboardPublished = true;
+        dataModified = true;
     }
 
     void displayCourse() {
