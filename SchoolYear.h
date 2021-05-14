@@ -100,18 +100,16 @@ public:
     }
     
     Class* getClass(int id) {
-        // TODO: Get class from linked list
         ClassNode* cur = classHead;
         for (; id > 0; --id) cur = cur -> next;
 
-           if (!cur -> data -> isAlreadyInputted())
+        if (!cur -> data -> isAlreadyInputted())
             cur -> data -> getClassFromFile();
 
         return cur -> data;
     }
     
-    void inputNewClass() {
-        // TODO: Input new class by hand
+    bool inputNewClass() {
         Class* newClass = Class::inputNewClass(name);
 
         if (newClass) {
@@ -134,13 +132,11 @@ public:
     }
 
     Semester* getLastedSemester() {
-        // TODO: Get last semester
         if (semestersCount == 0) return nullptr;
         return semesters[semestersCount - 1];
     }
 
-    void inputNewSemester() {
-        // TODO: Input new semester by hand
+    bool inputNewSemester() {
         Semester* newSemester = Semester::inputNewSemester(semestersCount);
 
         if (newSemester) {
@@ -157,7 +153,7 @@ public:
         return false;
     } 
 
-    void displayClassesMenu(int s) {
+    void displayClassesMenu() {
         const int titleLines = 5;
         string title[titleLines] = {
             name,                    
@@ -204,6 +200,12 @@ public:
     }
 
     void displaySemestersMenu(int s) {
+        cout << "This is list of semesters: \n";
+        for (int i = 0; i < semestersCount; ++i) 
+            cout << '\t' << s + i << ". Semester " << semesters[i] -> getName() << '\n';
+        if (semestersCount < 3)
+            cout << '\t' << s + semestersCount + 1 << ". Create semester\n";
+
         const int titleLines = 5;
         string title[titleLines] = {
             name,
@@ -267,8 +269,7 @@ public:
     }
 
     static SchoolYear* inputNewSchoolYear() {
-        // TODO: Input new school year by hand
-            string newName = 
+        string newName = 
             to_string(CURRENT_DATE.getYear()) 
             + "-" + 
             to_string(CURRENT_DATE.getYear() + 1);
@@ -280,8 +281,7 @@ public:
     }
 
     void getSchoolYearFromFile() {
-        // TODO: Get school year infromations from file
-         ifstream inp(SCHOOL_YEARS_FILE + name + ".csv");
+        ifstream inp(SCHOOL_YEARS_FILE + name + ".csv");
         
         if (inp) {
             string line, data;
@@ -308,8 +308,7 @@ public:
     }
 
     static Semester* getLastedSemesterFromFile(string schoolYearName) {
-        // TODO: Get lasted semester from file
-      ifstream inp(SCHOOL_YEARS_FILE + schoolYearName + ".csv");
+        ifstream inp(SCHOOL_YEARS_FILE + schoolYearName + ".csv");
 
         if (inp) {
             int semestersCount = 0;
@@ -332,8 +331,7 @@ public:
     }
 
     void putSchoolYearToFile() {
-        // TODO: Update school year informations to file
-                ofstream out(SCHOOL_YEARS_FILE + name + ".csv");
+        ofstream out(SCHOOL_YEARS_FILE + name + ".csv");
 
         if (classHead) {
             out << classHead -> data -> getName();
