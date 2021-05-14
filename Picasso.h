@@ -13,8 +13,8 @@ const int WINDOW_WIDTH = 128;
 
 void initWindowSize() { 
     COORD coord; 
-    coord.X = WINDOW_WIDTH; 
-    coord.Y = WINDOW_HEIGHT; 
+    coord.X = WINDOW_WIDTH + 100; 
+    coord.Y = WINDOW_HEIGHT + 100; 
 
     SMALL_RECT Rect; 
     Rect.Top = 0; 
@@ -131,6 +131,15 @@ void drawMenu(int titleLines, const string* title, int optionsCount, const strin
 }
 
 void drawTable(int startX, string tableTitle, int columnsCount, int* columnsWidth, string* columnsName, int rowsCount, string** table) {
+    for (int i = 0; i < columnsCount; ++i)  {
+        if (columnsWidth[i] < columnsName[i].size() + 2)
+            columnsWidth[i] = columnsName[i].size() + 2;
+
+        for (int j = 0; j < rowsCount; ++j)
+            if (columnsWidth[i] < table[j][i].size() + 2)
+                columnsWidth[i] = table[j][i].size() + 2;
+    }
+
     gotoXY(startX, (WINDOW_WIDTH - tableTitle.size()) / 2);
     cout << tableTitle;
 
@@ -142,7 +151,7 @@ void drawTable(int startX, string tableTitle, int columnsCount, int* columnsWidt
     int startY = (WINDOW_WIDTH - columnsWidthSum - columnsCount + 1) / 2 - 1;
     int y = startY;
 
-    if (startY < 0) startY = y = 0;
+    if (startY < 0) startY = y = 1;
 
     gotoXY(x + 1, startY);
     for (int i = 0; i < columnsWidthSum + columnsCount - 1; ++i) 
@@ -350,6 +359,30 @@ void drawOkayBox(string title, string message) {
     int choice = 0;
 
     drawBox(title, containsCount, contains, optionsCount, options, choice);
+}
+
+string getClipboardData() {
+    // Try opening the clipboard
+    if (! OpenClipboard(nullptr)) return "";
+
+    // Get handle of clipboard object for ANSI text
+    HANDLE hData = GetClipboardData(CF_TEXT);
+    if (hData == nullptr) return "";
+
+    // Lock the handle to get the actual text pointer
+    char * pszText = static_cast<char*>(GlobalLock(hData));
+    if (pszText == nullptr) return "";
+
+    // Save text in a string class instance
+    string text(pszText);
+
+    // Release the lock
+    GlobalUnlock(hData);
+
+    // Release the clipboard
+    CloseClipboard();
+
+    return text;
 }
 
 bool drawInputBox(string title, int fieldLength, int inputsCount, string* instructions, string* inputsData) {
