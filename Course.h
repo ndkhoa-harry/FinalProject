@@ -378,6 +378,61 @@ int id, credits, maxStudents, day1, day2, session1, session2;
 
     void inputCourseFromFile() {
         // TODO: Input course from file
+        ifstream inp(COURSES_FILE + to_string(id) + ".csv");
+
+        if (inp) {
+            string line, data;
+
+            getline(inp, line);
+
+            stringstream s(line);
+
+            getline(s, data, ',');
+            id = stoi(data);
+
+            getline(s, courseName, ',');
+
+            getline(s, teacherName, ',');
+
+            getline(s, data, ',');
+            credits = stoi(data);
+
+            getline(s, data, ',');
+            maxStudents = stoi(data);
+
+            getline(s, data, ',');
+            session1 = stoi(data);
+
+            getline(s, data, ',');
+            session2 = stoi(data);
+
+            getline(s, startDate, ',');
+            getline(s, endDate, ',');
+
+            if (getline(inp, line)) {
+                if (line.compare("private") == 0) {
+                    scored = true;
+                    scoreboardPublished = false;
+                } else if (line.compare("public") == 0) {
+                    scored = true;
+                    scoreboardPublished = true;
+                } else {
+                    stringstream s(line);
+                    addStudent(Student::getStudentFromStringStream(s));
+                }
+
+                while (getline(inp, line)) {
+                    stringstream s(line);
+                    addStudent(Student::getStudentFromStringStream(s));
+                } 
+            }
+
+            alreadyInputted = true;
+        }
+
+        rearrangeNo();
+
+        inp.close();
     }
 
     void putCourseToFile() {
