@@ -81,7 +81,7 @@ public:
     }
 
     Course* getCourse(int id) {
-         Node* cur = head;
+        Node* cur = head;
 
         for(; id > 0; --id) cur = cur -> next;
 
@@ -89,7 +89,6 @@ public:
             cur -> data -> inputCourseFromFile();
 
         return cur -> data;
-        
     }
 
     Course* getCourseFromID(int id) {
@@ -134,9 +133,13 @@ public:
     }
 
     void inputNewCourse() {
-        addCourse(Course::inputNewCourse());
+        Course* newCourse = Course::inputNewCourse();
 
-        dataModified = true;
+        if (newCourse) {
+            addCourse(newCourse);
+
+            dataModified = true;
+        }
     }
 
     void displayCoursesMenu() {
@@ -157,18 +160,18 @@ public:
             " \\___\\___/ \\___/|_|_\\|___/___|___/"
         };
 
-        const int optionsCount = coursesCount + (coursesCount < 5);
-        string* options = new string[optionsCount];
-
-        Node* cur = head;
-        for (int i = 0; cur; ++i, cur = cur -> next)
-            options[i] = cur -> data -> getCourseName();
-        if (coursesCount < 5)
-            options[coursesCount] = "Create new course";
-
         int choice = 0;
 
         while (1) {
+            const int optionsCount = coursesCount + (coursesCount < 5);
+            string* options = new string[optionsCount];
+
+            Node* cur = head;
+            for (int i = 0; cur; ++i, cur = cur -> next)
+                options[i] = cur -> data -> getCourseName();
+            if (coursesCount < 5)
+                options[coursesCount] = "Create new course";
+
             drawMenu(titleLines, title, optionsCount, options, choice);
 
             if (0 <= choice && choice < coursesCount) {
@@ -182,6 +185,8 @@ public:
 
                 return dataModified;
             }
+
+            delete[] options;
         }
     }
 
