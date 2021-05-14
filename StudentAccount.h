@@ -69,6 +69,7 @@ public:
 
         if (account) delete account;
 
+        delete student;
         delete[] enrolledCourses;
     }
 
@@ -83,9 +84,20 @@ public:
             enrolledCourses[enrolledCoursesCount++] = course;
     }
 
-    void removeCourse(int id) {
-        // TODO: Remove course from list
-         int id = -1;
+    Course* getEnrolledCourse(int id) {
+        Course* course = nullptr;
+
+        if (id < enrolledCoursesCount) 
+            course = enrolledCourses[id];
+
+        if (course && !course -> isAlreadyInputted())
+            course -> inputCourseFromFile();
+
+        return course;
+    }
+
+    void removeCourse(int courseID) {
+        int id = -1;
         for (int i = 0; i < enrolledCoursesCount; ++i)
             if (enrolledCourses[i] -> getID() == courseID) {
                 id = i;
@@ -107,38 +119,81 @@ public:
     }
 
     void enrolledCoursesTable() {
-        int choice;
+        const int titleLines = 4;
+        string title[titleLines] = {        
+            " ___ _  _ ___  ___  _    _    ___ ___     ___ ___  _   _ ___  ___ ___ ___ ",
+            "| __| \\| | _ \\/ _ \\| |  | |  | __|   \\   / __/ _ \\| | | | _ \\/ __| __/ __|",
+            "| _|| .` |   / (_) | |__| |__| _|| |) | | (_| (_) | |_| |   /\\__ \\ _|\\__ \\",
+            "|___|_|\\_|_|_\\\\___/|____|____|___|___/   \\___\\___/ \\___/|_|_\\|___/___|___/"                                                                     
+        };
+
+        const int columnsCount = 7;
+        int columnsWidth[columnsCount] = { 4, 11, 13, 30, 9, 20, 20 };
+        string columnsName[columnsCount] = {
+            "No",
+            "Course ID",
+            "Course name",
+            "Teacher name",
+            "Credits",
+            "First session",
+            "Second session"
+        };
 
         while (1) {
-            cout << "This is list of enrolled courses: \n";
-            
-            for (int i = 0; i < enrolledCoursesCount; ++i) 
-                cout << '\t' << i + 1 << ". " << enrolledCourses[i] -> getCourseName() << '\n';
-            cout << '\t' << enrolledCoursesCount + 1 << ". Remove a course\n";
+            int x = 3;
 
-            int choice;
-            cout << "Enter your choice: "; cin >> choice;
-            --choice;
+            system("cls");
+            drawTitle(x, titleLines, title);
 
-            if (choice < enrolledCoursesCount) {
-                if (!enrolledCourses[choice] -> isAlreadyInputted())
-                    enrolledCourses[choice] -> inputCourseFromFile();
+            const int rowsCount = enrolledCoursesCount;
 
-                enrolledCourses[choice] -> displayCourse();
-            } else if (choice == enrolledCoursesCount) {
-                cout << "Enter the course you want to remove: ";
-                cin >> choice;
-                --choice;
+            string** table = new string* [rowsCount];
+            for (int i = 0; i < rowsCount; ++i) {
+                Course* course = getEnrolledCourse(i);
 
-                removeCourse(choice);
-            } else
+                table[i] = new string[columnsCount] {
+                    to_string(i + 1),
+                    course -> getCourseID(),
+                    course -> getCourseName(),
+                    course -> getTeacherName(),
+                    to_string(course -> getCredits()),
+                    course -> getFirstSessionToString(),
+                    course -> getSecondSessionToString()
+                };
+            }
+
+            ++x;
+            drawTable(x, "", columnsCount, columnsWidth, columnsName, rowsCount, table);
+            cout << "\n\n";
+
+            for (int i = 0; i < rowsCount; ++i) delete[] table[i];
+            delete[] table;
+
+            if (enrolledCoursesCount > 0) {
+                cout << "Press (1) to remove a course\n";
+
+                char choice = getch();
+
+                if (choice == '1') {
+                    int id;
+
+                    cout << "Enter the course ID you want to remove: ";
+                    cin >> id;
+
+                    if (drawYesNoBox("Warning!!!", "Do you really want to remove this course?")) 
+                        removeCourse(id);
+                } else
+                    return;
+            } else {
+                getch();
+                
                 return;
+            }
         }
     }
     
     void displayScoreboardFromFile() {
-        // TODO: Display scoreboard from file
-             const int titleLines = 4;
+        const int titleLines = 4;
         string title[titleLines] = {
             " ___  ___ ___  ___ ___ ___  ___   _   ___ ___  ",
             "/ __|/ __/ _ \\| _ \\ __| _ )/ _ \\ /_\\ | _ \\   \\ ",
@@ -167,7 +222,7 @@ public:
 
             table[i] = new string[columnsCount] {
                     to_string(i + 1),
-                    to_string(course -> getID()),
+                    course -> getCourseID(),
                     course -> getCourseName(),
                     "x",
                     "x",
@@ -195,10 +250,9 @@ public:
 
         getch();
     }
-    
+
     void displayMyInformation() {
-        // TODO: Display student in formation
-         string title = "Self information";
+        string title = "Self information";
 
         const int containsCount = 5;
         string contains[containsCount] = {
@@ -250,8 +304,7 @@ public:
     }
 
     void getStudentAccountFromFile() {
-        // TODO: Get student account informations from file
-         ifstream inp(STUDENTS_FILE + to_string(account -> getId()) + ".csv");
+        ifstream inp(STUDENTS_FILE + to_string(account -> getId()) + ".csv");
         if (inp) {
             string line, data;
 
@@ -264,28 +317,46 @@ public:
             stringstream s(line);
             student = Student::getStudentFromStringStream(s);
 
+            getline(inp, data, ',');
+            student -> setOverallMarks(stod(data));
+            getline(inp, data);
+            student -> setOverallCredits(stoi(data));
+
             while (getline(inp, line)) {
+                cout << line << '\n';
                 stringstream s(line);
 
                 getline(s, data, ',');
-                addCourse(semester -> getCourseFromID(stoi(data)));
+                Course* course = semester -> getCourseFromID(stoi(data));
+
+                if (course) {
+                    getline(s, data, ',');
+                    course -> setFirstSession(stoi(data));
+
+                    getline(s, data, ',');
+                    course -> setSecondSession(stoi(data));
+
+                    addCourse(course);
+                }
             }
 
             inp.close();
+        }
     }
 
     void putStudentAccountToFile() {
-        // TODO: Update student account informations to file
         ofstream out(STUDENTS_FILE + to_string(account -> getId()) + ".csv");
 
         out << schoolYearName << ',' << className << '\n';
 
         student -> putDataToStream(out);
 
-        if (enrolledCoursesCount > 0)
-            out << enrolledCourses[0] -> getID();
-        for (int i = 1; i < enrolledCoursesCount; ++i)
-            out << ',' << enrolledCourses[i];
+        out << student -> getOverallMarks() << ',' << student -> getOverallCredits() << '\n';
+
+        for (int i = 0; i < enrolledCoursesCount; ++i)
+            out << enrolledCourses[i] -> getID() << ','
+                << enrolledCourses[i] -> getFirstSession() << ','
+                << enrolledCourses[i] -> getSecondSession() << '\n';
 
         out.close();
     }
