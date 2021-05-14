@@ -2,13 +2,14 @@
 #define _STUDENT_H_
 
 #include "Helper.h"
-#include <conio.h>
+
 #include "Person.h"
+#include "Account.h"
 
 class Student : public Person {
 private:
-    int no;
-    double totalMark, finalMark, midtermMark, otherMark;
+    int no, overallCredits;
+    double totalMark, finalMark, midtermMark, otherMark, overallMarks;
 
     bool scored;
     
@@ -38,21 +39,107 @@ public:
 
     int getNo() { return no; }
 
+    double getTotalMark() { return totalMark; }
+
     double getFinalMark() { return finalMark; }
 
+    double getMidtermMark() { return midtermMark; }
+
+    double getOtherMark() { return otherMark; }
+
+    void setOverallMarks(double overallMarks) { this -> overallMarks = overallMarks; }
+
+    double getOverallMarks() { return overallMarks; }
+
+    void setOverallCredits(int overallCredits) { this -> overallCredits = overallCredits; }
+
+    int getOverallCredits() { return overallCredits; }
+
+    double getOverallGPA() {
+        if (overallCredits == 0)
+            return 0.0;
+        else
+            return overallMarks / overallCredits;
+    }
+
     bool isScored() { return scored; }
+
+    void getOverallMarksCredits() {
+        ifstream inp(STUDENTS_FILE + to_string(getId()) + ".csv");
+
+        if (inp) {
+            string data;
+
+            getline(inp, data);
+            getline(inp, data);
+
+            getline(inp, data, ',');
+            setOverallMarks(stod(data));
+
+            getline(inp, data);
+            setOverallCredits(stoi(data));
+
+            inp.close();
+        }
+    }
     
-    void inputScore() {
-        // TODO: Input scores by hand
-        cout << "Enter total mark: "; cin >> totalMark;
-        cout << "Enter final mark: "; cin >> finalMark;
-        cout << "Enter midterm mark: "; cin >> midtermMark;
-        cout << "Enther other mark: "; cin >> otherMark;
+    bool inputScore() {
+        string title = "Input score";
+
+        int fieldLength = 30;
+
+        const int inputsCount = 4;
+
+        string instructions[inputsCount] = {
+            "Enter total mark: ",
+            "Enter final mark: ",
+            "Enter midtern mark: ",
+            "Enter other mark: "
+        };
+
+        string inputsData[inputsCount] = { "", "", "", "" };
+
+        if (drawInputBox(title, fieldLength, inputsCount, instructions, inputsData)) {
+            totalMark = stod(inputsData[0]);
+            finalMark = stod(inputsData[1]);
+            midtermMark = stod(inputsData[2]);
+            otherMark = stod(inputsData[3]);
+
+            return true;
+        } else 
+            return false;
     }
 
     void publishScores(int courseID) {
-        // TODO: Publish all score
-         ifstream inp(STUDENTS_FILE + to_string(getId()) + ".csv");
+        ifstream inp(STUDENTS_FILE + to_string(getId()) + ".csv");
+
+        if (inp) {
+            ofstream out(STUDENTS_TEMPORARY_FILE);
+
+            string line;
+
+            for (int i = 0; i < 3; ++i) {
+                getline(inp, line);
+                out << line << '\n';
+            }
+
+            while (getline(inp, line)) {
+                if (line.compare(to_string(courseID)) == 0) 
+                    out << courseID << ',' << totalMark << ',' << finalMark << ',' << midtermMark << ',' << otherMark << '\n';
+                else 
+                    out << line << '\n';
+            }
+
+            inp.close();
+            out.close();
+
+            remove((STUDENTS_FILE + to_string(getId()) + ".csv").c_str());
+            rename(STUDENTS_TEMPORARY_FILE.c_str(), (STUDENTS_FILE + to_string(getId()) + ".csv").c_str());
+        }
+    }
+
+    void updateOverallGPA(int credits) {
+        ifstream inp(STUDENTS_FILE + to_string(getId()) + ".csv");
 
         if (inp) {
             ofstream out(STUDENTS_TEMPORARY_FILE);
@@ -65,12 +152,15 @@ public:
             getline(inp, line);
             out << line << '\n';
 
-            while (getline(inp, line)) {
-                if (line.compare(to_string(courseID)) == 0)
-                    out << courseID << ',' << totalMark << ',' << finalMark << ',' << midtermMark << ',' << otherMark << '\n';
-                else
-                    out << line << '\n';
-            }
+            getline(inp, line, ',');
+            overallMarks = stod(line) + totalMark * credits;
+
+            getline(inp, line);
+            overallCredits = stoi(line) + credits;
+
+            out << overallMarks << ',' << overallCredits << '\n';
+
+            while (getline(inp, line)) out << line << '\n';
 
             inp.close();
             out.close();
@@ -97,38 +187,38 @@ public:
     }
 
     static Student* inputNewStudent(int no) {
-        // TODO: Input new student by hand
-        int id, studentCount;
-        string firstName, lastName, dob;
-        char gender;
+        string title = "Input student No. " + to_string(no) + " information";
 
-        cout << "Enter No. " << no << " student informations: \n";
-        cout << "\tID: "; cin >> id;
+        int fieldLength = 60;
 
-        cout << "\tFirst Name: ";
-        cin.ignore();
-        getline(cin, firstName);
+        const int inputsCount = 5;
+        string instructions[inputsCount] = {
+            "ID: ",
+            "First name: ",
+            "Last name: ",
+            "Gender (M/F): ",
+            "Date of birth (dd/mm/yyyy): "
+        };
 
-        cout << "\tLast Name: ";
-        getline(cin, lastName);
+        string inputsData[inputsCount];
+        for (int i = 0; i < inputsCount; ++i) inputsData[i] = "";
 
-        cout << "\tGender (Male: Y/N): "; cin >> gender;
-        cout << "\tDate of birth (dd/mm/yyyy): "; cin >> dob;
-
-        return new Student(
-            no,
-            id,
-            firstName,
-            lastName,
-            gender == ('Y' || 'y') ? "Male" : "Female",
-            dob
-        );
+        if (drawInputBox(title, fieldLength, inputsCount, instructions, inputsData))
+            return new Student(
+                no,
+                stoi(inputsData[0]),
+                inputsData[1],
+                inputsData[2],
+                inputsData[3] == "M" ? "Male" : "Female",
+                inputsData[4]
+            );
+        else
+            return nullptr;
     }
 
     static Student* getStudentFromStringStream(stringstream &s) {
-        // TODO: Get student from string stream
-         int componentsCount = 0;
-        string* data = new string[MAX_COMPONENTS];
+        int componentsCount = 0;
+        string* data = new string[STUDENT_MAX_COMPONENTS];
 
         while (getline(s, data[componentsCount], ',')) ++componentsCount;
 
@@ -157,11 +247,9 @@ public:
         delete[] data;
 
         return student;
-        return nullptr;
     }
 
     void putDataToStream(ofstream &out) {
-        // TODO: Put student data to stream
         if (scored) {
             out << no << ','
                 << getId() << ','
@@ -170,8 +258,7 @@ public:
                 << finalMark << ','
                 << midtermMark << ','
                 << otherMark << '\n';
-        }
-        else {
+        } else {
             out << no << ','
                 << getId() << ','
                 << getFirstName() << ','
@@ -179,6 +266,18 @@ public:
                 << getGender() << ','
                 << getDob() << '\n';
         }
+    }
+
+    void createStudentFiles(string schoolYearName, string className) {
+        ofstream out(STUDENTS_FILE + to_string(getId()) + ".csv");
+
+        out << schoolYearName << ',' << className << '\n';
+        putDataToStream(out);
+        out << "0,0\n";
+
+        out.close();
+
+        Account::addNewAccount(getId(), "1");
     }
 };
 
