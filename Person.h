@@ -50,13 +50,6 @@ public:
     void setDob(char* dob) { this -> dob = dob; }
 
     string getDob() { return dob; }
-
-    void display() {
-        cout << "ID: " << id << '\n';
-        cout << "Full name: " << lastName << " " << firstName << '\n';
-        cout << "Day of birth: " << dob << '\n';
-        cout << "Gender: " << gender << '\n';
-    }
 }; 
 
 #endif
