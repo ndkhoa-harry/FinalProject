@@ -13,7 +13,7 @@ private:
     };
 
     int id, credits, maxStudents, session1, session2;
-    string courseName, teacherName, startDate, endDate;
+    string courseID, courseName, teacherName, startDate, endDate;
 
     Node* head, *tail;
     int studentsCount;
@@ -43,10 +43,12 @@ public:
         this -> courseName = courseName;
     }
 
-    Course(int id, string courseName, string teacherName, int credits, int session1, int session2, string startDate, string endDate)
+    Course(int id, string courseID, string courseName, string teacherName, int credits, int maxStudents, int session1, int session2, string startDate, string endDate)
         : Course(id, courseName) {
+            this -> courseID = courseID;
             this -> teacherName = teacherName;
             this -> credits = credits;
+            this -> maxStudents = maxStudents;
             this -> session1 = session1;
             this -> session2 = session2;
             this -> startDate = startDate;
@@ -70,18 +72,44 @@ public:
 
     int getID() { return id; }
 
+    string getCourseID() { return courseID; }
+
     string getCourseName() { return courseName; }
+
+    string getTeacherName() { return teacherName; }
 
     int getCredits() { return credits; }
 
+    void setFirstSession(int session1) { this -> session1 = session1; }
+
+    int getFirstSession() { return session1; }
+
+    void setSecondSession(int session2) { this -> session2 = session2; }
+
+    int getSecondSession() { return session2; }
+
+    string getFirstSessionToString() {
+        return DAY_OF_WEEK[session1 / 4] + " " + SESSIONS[session1 % 4];
+    }
+
+    string getSecondSessionToString() {
+        return DAY_OF_WEEK[session2 / 4] + " " + SESSIONS[session2 % 4];
+    }
+
     int getStudentsCount() { return studentsCount; }
+
+    bool isScored() { return scored; }
+
+    bool isPublished() { return scoreboardPublished; }
 
     bool isAlreadyInputted() { return alreadyInputted; }
 
     void addStudent(Student* student) {
         Node* pNew = new Node;
 
-        pNew -> data = student;
+        pNew -> data = new Student;
+        *pNew -> data = *student;
+
         pNew -> next = nullptr;
 
         if (!head) {
@@ -104,7 +132,6 @@ public:
     }
 
     Student* findStudentFromID(int id) {
-        // TODO: Find student from ID
         Node* cur = head;
 
         while (cur) {
@@ -112,12 +139,13 @@ public:
             if (cur -> data -> getId() == id) 
                 return cur -> data;
             cur = cur -> next;
+        }
+
         return nullptr;
     }
 
     void removeStudent(int id) {
-        // TODO: Remove student from course
-         Node* cur = head, *tmp;
+        Node* cur = head, *tmp;
 
         if (head -> data -> getId() == id) {
             tmp = head;
@@ -137,9 +165,16 @@ public:
         dataModified = true;
     }
 
+    void updateStudentsOverallGPA() {
+        Node* cur = head;
+        while (cur) {
+            cur -> data -> updateOverallGPA(credits);
+            cur = cur -> next;
+        }
+    }
+
     void rearrangeNo() {
-        // TODO: Rearrange no of all students
-         Node* cur = head;
+        Node* cur = head;
         for (int i = 1; cur; ++i) {
             cur -> data -> setNo(i);
             cur = cur -> next;
@@ -147,8 +182,7 @@ public:
     }
 
     void publishScoreboard() {
-        // TODO: Publish scoreboard
-         Node* cur = head;
+        Node* cur = head;
         while (cur) {
             cur -> data -> publishScores(id);
             cur = cur -> next;
@@ -159,7 +193,14 @@ public:
     }
 
     void displayCourse() {
-        cout << "Course " << id << " information:\n";
+        system("cls");
+
+        string title = courseName;
+        gotoXY(2, (WINDOW_WIDTH - title.size()) / 2);
+        cout << title;
+
+        gotoXY(4, 0);
+        cout << "\tCourse ID: " << courseID << '\n';
         cout << "\tCourse name: " << courseName << '\n';
         cout << "\tTeacher name: " << teacherName << '\n';
         cout << "\tMaximum number of students: " << maxStudents << '\n';
@@ -297,39 +338,55 @@ public:
         }
     }
 
-    bool displayStudentCourse(Student* student, Course* *enrolledCourses, int &enrolledCoursesCount) {
+    bool displayStudentCourse(Student* student, int &enrolledCoursesCount, Course* *enrolledCourses) {
         displayCourse();
 
         if (enrolledCoursesCount >= 5) {
             cout << "You reach the maximum number of courses you can enroll!!!\n";
+            getch();
         } else {
-            bool enrolled = false;
-            for (int i = 0; i < enrolledCoursesCount; ++i) 
-                if (enrolledCourses[i] -> getID() == id) {
+            Course* course = nullptr;
+            bool enrolled = false, intersect = false;
+
+            for (int i = 0; i < enrolledCoursesCount; ++i) {
+                course = enrolledCourses[i];
+
+                if (course -> getID() == id) {
                     enrolled = true;
                     break;
+                } else if (course -> getFirstSession() == session1 || course -> getFirstSession() == session2
+                            || course -> getSecondSession() == session1 || course -> getSecondSession() == session2) {
+                    intersect = true;
+                    break;
                 }
+            }
 
-            if (enrolled) 
+            if (enrolled) {
                 cout << "You've already enrolled this course!!!\n";
-            else if (studentsCount == maxStudents)
+                getch();
+            } else if (intersect) {
+                cout << "You can't enroll this course because the sessions of this course is conflicted with enrolled course sessions (Course " 
+                        << course -> getCourseName() << ")\n";
+                getch();
+            } else if (studentsCount == maxStudents) {
                 cout << "This course is full!!\n";
-            else {
-                int choice;
+                getch();
+            } else {
+                cout << "Press (1) to enroll this course";
+                char choice = getch();
 
-                cout << "Press (1) to enroll this course: ";
-                cin >> choice;
+                if (choice == '1') {
+                    if (drawYesNoBox("Warning!!!", "Do you really want to enroll this course?")) {
+                        enrolledCourses[enrolledCoursesCount++] = this;
 
-                if (choice == 1) {
-                    // TODO: Enroll student to this course
-                    enrolledCourses[enrolledCoursesCount++] = this;
+                        addStudent(student);
+                        rearrangeNo();
 
-                    addStudent(student);
-                    rearrangeNo();
+                        dataModified = true;
 
-                    dataModified = true;
-
-                    return true;
+                        return true;
+                    } else
+                        return displayStudentCourse(student, enrolledCoursesCount, enrolledCourses);
                 } else 
                     return false;
             }
@@ -339,45 +396,50 @@ public:
     }
 
     static Course* inputNewCourse() {
-        // TODO: Input new course by hand
-int id, credits, maxStudents, day1, day2, session1, session2;
-        string courseName, teacherName, startDate, endDate;
+        string title = "Create new course";
 
-        cout << "Create new course: \n";
-        cout << "\tCourse ID: "; cin >> id;
-        cout << "\tCourse name: "; cin >> courseName;
+        int fieldLength = 100;
 
-        cout << "\tTeacher name: "; 
-        cin.ignore(1);
-        getline(cin, teacherName, '\n');
+        const int inputsCount = 12;
+        string instructions[inputsCount] = {
+            "Course unique ID: ",
+            "Course ID: ",
+            "Course name: ",
+            "Teacher name: ",
+            "Number of credits: ",
+            "Number of maximum students: ",
+            "First day (Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5): ",
+            "First session (SS1: 0, SS2: 1, SS3: 3, SS4: 4): ",
+            "Second day (Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5): ",
+            "Second session (SS1: 0, SS2: 1, SS3: 3, SS4: 4): ",
+            "Registration start date (dd/mm/yyyy): ",
+            "Redistration end date (dd/mm/yyyy): "
+        };
 
-        cout << "\tNumber of credits: "; cin >> credits;
-        cout << "\tNumber of maximum students: "; cin >> maxStudents;
-        cout << "\tFirst day: "; cin >> day1;
-        cout << "\tFirst session: "; cin >> session1;
-        cout << "\tSecond day: "; cin >> day2;
-        cout << "\tSecond session: "; cin >> session2;
-        cout << "\tRegistration start date (dd/mm/yyyy): "; cin >> startDate;
-        cout << "\tRegistration end date (dd/mm/yyyy): "; cin >> endDate;
-        
-        Course* course = new Course(
-            id,
-            courseName,
-            teacherName,
-            credits,
-            day1 * 4 + session1,
-            day2 * 4 + session2,
-            startDate,
-            endDate
-        );
+        string* inputsData = new string[inputsCount];
 
-        course -> putCourseToFile();
+        if (drawInputBox(title, fieldLength, inputsCount, instructions, inputsData)) {
+            Course* course = new Course(
+                stoi(inputsData[0]),
+                inputsData[1],
+                inputsData[2],
+                inputsData[3],
+                stoi(inputsData[4]),
+                stoi(inputsData[5]),
+                stoi(inputsData[6]) * 4 + stoi(inputsData[7]),
+                stoi(inputsData[8]) * 4 + stoi(inputsData[9]),
+                inputsData[10],
+                inputsData[11]
+            );
 
-        return course;
+            course -> putCourseToFile();
+
+            return course;
+        } else
+            return nullptr;
     }
 
     void inputCourseFromFile() {
-        // TODO: Input course from file
         ifstream inp(COURSES_FILE + to_string(id) + ".csv");
 
         if (inp) {
@@ -389,6 +451,8 @@ int id, credits, maxStudents, day1, day2, session1, session2;
 
             getline(s, data, ',');
             id = stoi(data);
+
+            getline(s, courseID, ',');
 
             getline(s, courseName, ',');
 
@@ -436,18 +500,18 @@ int id, credits, maxStudents, day1, day2, session1, session2;
     }
 
     void putCourseToFile() {
-        // TODO: Update course informations to file
-         ofstream out(COURSES_FILE + to_string(id) + ".csv");
+        ofstream out(COURSES_FILE + to_string(id) + ".csv");
 
-        out << id << ',';
-        out << courseName << ',';
-        out << teacherName << ',';
-        out << credits << ',';
-        out << maxStudents << ',';
-        out << session1 << ',';
-        out << session2 << ',';
-        out << startDate << ',';
-        out << endDate << '\n';
+        out << id << ','
+            << courseID << ','
+            << courseName << ','
+            << teacherName << ','
+            << credits << ','
+            << maxStudents << ','
+            << session1 << ','
+            << session2 << ','
+            << startDate << ','
+            << endDate << '\n';
 
         if (scored) {
             if (scoreboardPublished)
@@ -466,8 +530,7 @@ int id, credits, maxStudents, day1, day2, session1, session2;
     }
 
     void exportToCSV(string dir) {
-        // TODO: Export to .csv file
-          ofstream out(dir + '/' + to_string(id) + '_' + courseName + ".csv");
+        ofstream out(dir + '/' + to_string(id) + '_' + courseName + ".csv");
 
         Node* cur = head;
         while (cur) {
