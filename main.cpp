@@ -23,27 +23,19 @@ void mainProcess(Account* account) {
 }
 
 int main() {
+    initWindowSize();
+
     int id;
     string pass;
     Account* account = nullptr;
 
     while (1) {    
-        cout << "Type your ID: "; cin >> id;
-        cout << "Type your Pass: "; cin >> pass;
+        account = Account::displayLoginBox();
 
-        account = Account::findAccountFromFile(id);
-
-        if (account) {
-            if (pass.compare(account -> getPass()) == 0) {
-                cout << "Login successfully!!!\n";
-
-                mainProcess(account);
-
-                break;
-            } else 
-                cout << "Incorrect password!!!\n";
-        } else 
-            cout << "Incorrect username!!!\n";
+        if (account)
+            mainProcess(account);
+        else
+            break;
     } 
 
     return 0;
