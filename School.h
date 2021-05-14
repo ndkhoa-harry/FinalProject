@@ -5,6 +5,24 @@
 
 #include "SchoolYear.h"
 
+const int SCHOOL_TITLE_LINES = 4;
+const string SCHOOL_TITLE[] = {
+" ___  ___ _  _  ___   ___  _     __   _____   _   ___  ___ ",
+"/ __|/ __| || |/ _ \\ / _ \\| |    \\ \\ / / __| /_\\ | _ \\/ __|",
+"\\__ \\ (__| __ | (_) | (_) | |__   \\ V /| _| / _ \\|   /\\__ \\",
+"|___/\\___|_||_|\\___/ \\___/|____|   |_| |___/_/ \\_\\_|_\\|___/"                                                    
+};
+
+const int SCHOOL_OPTIONS_COUNT = 6;
+const string SCHOOL_OPTIONS[] = {
+    "First year",
+    "Second year",
+    "Third year",
+    "Forth year",
+    "Find a school year",
+    "Create new school year"
+};
+
 class School {
 private:
     struct Node {
@@ -58,8 +76,19 @@ public:
         ++schoolYearsCount;
     }
 
+    void addSchoolYearToHead(SchoolYear* schoolYear) {
+        Node* newNode = new Node;
+
+        newNode -> data = schoolYear;
+        newNode -> next = head;
+
+        if (!head) tail = newNode;
+        head = newNode;
+
+        ++schoolYearsCount;
+    }
+
     SchoolYear* getSchoolYear(int id) {
-        // TODO: Get school year in linked list
         Node* cur = head;
 
         for (; id > 0; --id) cur = cur -> next;
@@ -68,51 +97,61 @@ public:
             cur -> data -> getSchoolYearFromFile();
 
         return cur -> data;
-        
+    }
+
+    SchoolYear* findSchoolYear(string schoolYearName) {
+        Node* cur = head;
+
+        while (cur) {
+            if (cur -> data -> getName().compare(schoolYearName) == 0)
+                return cur -> data;
+
+            cur = cur -> next;
+        }
+
+        return nullptr;
     }
 
     void inputNewSchoolYear() {
-        // TODO: Input new school year by hand
-        if (!head) {
-            head = new Node;
-            tail = head;
-        } else {
-            tail -> next = new Node;
-            tail = tail -> next;
+        SchoolYear* newSchoolYear = SchoolYear::inputNewSchoolYear();
+
+        if (newSchoolYear) {
+            addSchoolYearToHead(newSchoolYear);
+
+            newSchoolYear -> displayMenu();
         }
-
-        tail -> data = schoolYear;
-        tail -> next = nullptr;
-
-        ++schoolYearsCount;
+        
+        dataModified = true;
     }
     
     void displayMenu() {
-        int choice;
+        int choice = 0;
+
         while (1) {
-            cout << "This is list of shool years: \n";
+            drawMenu(SCHOOL_TITLE_LINES, SCHOOL_TITLE, SCHOOL_OPTIONS_COUNT, SCHOOL_OPTIONS, choice);
 
-            Node* cur = head;
-            for (int i = 1; cur; ++i, cur = cur -> next) 
-                cout << '\t' << i << ". " << cur -> data -> getName() << '\n';
-            cout << '\t' << schoolYearsCount + 1 << ". Create new school year\n";
-
-            cout << "Enter your choice: "; cin >> choice;
-            --choice;
-            
-            if (choice < schoolYearsCount) {
+            if (0 <= choice && choice < 4) {
                 SchoolYear* schoolYear = getSchoolYear(choice);
                 schoolYear -> displayMenu();
-            } else if (choice == schoolYearsCount) {
+            } else if (choice == 4) {
+                string schoolYearName = "";
+
+                if (drawInputBox("Find school year", 55, "Enter school year name you want to find: ", schoolYearName)) {
+                    SchoolYear* schoolYear = findSchoolYear(schoolYearName);
+
+                    if (schoolYear) 
+                        schoolYear -> displayMenu();
+                    else
+                        drawOkayBox("Error!!!", "Can't find school year " + schoolYearName);
+                }
+            } else if (choice == 5) {
                 inputNewSchoolYear();
-            } else {
+            } else 
                 return;
-            }
         }
     }
 
     static School getSchoolFromFile() {
-        // TODO: Get all school years from file
         ifstream inp(SCHOOL_FILE);
         School school;
 
@@ -131,8 +170,7 @@ public:
     }
 
     void putSchoolToFile() {
-        // TODO: Update school informations to file
-           ofstream out(SCHOOL_FILE);
+        ofstream out(SCHOOL_FILE);
 
         Node* cur = head;
         while (cur) {
