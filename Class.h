@@ -99,7 +99,39 @@ public:
 
     void displayClassScoreboard(Semester* lastedSemester) {
         // TODO: Display class scoreboard
+        Course* *courses;
+        int coursesCount;
+        lastedSemester -> getAllCoursesInfo(coursesCount, courses);
         
+        Student* *students;
+        int studentsCount;
+        getAllStudentsInfo(studentsCount, students);
+        cout << studentsCount << '\n';
+
+        for (int i = 0; i < studentsCount; ++i) {
+            students[i] -> display();
+
+            cout << "Final mark of all courses: \n";
+
+            double totalFinalMark = 0.0;
+            int totalCredits = 0;
+
+            for (int j = 0; j < coursesCount; ++j) {
+                Student* scoredStudent = courses[j] -> findStudentFromID(students[i] -> getId());
+                if (scoredStudent) {
+                    cout << courses[j] -> getCourseName() << ": " << scoredStudent -> getFinalMark() << ' ';
+
+                    totalFinalMark += scoredStudent -> getFinalMark() * courses[j] -> getCredits();
+                    totalCredits += courses[j] -> getCredits();
+                }
+            }
+            cout << '\n';
+
+            cout << "GPA of " << lastedSemester -> getName() << " semester: " << totalFinalMark / totalCredits << '\n';
+        }
+
+        delete[] students;
+        delete[] courses;
     }
 
     void displayMenu(Semester* lastedSemester) {
