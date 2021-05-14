@@ -322,6 +322,12 @@ public:
 
                 if (choice == 1) {
                     // TODO: Enroll student to this course
+                    enrolledCourses[enrolledCoursesCount++] = this;
+
+                    addStudent(student);
+                    rearrangeNo();
+
+                    dataModified = true;
 
                     return true;
                 } else 
@@ -334,8 +340,40 @@ public:
 
     static Course* inputNewCourse() {
         // TODO: Input new course by hand
+int id, credits, maxStudents, day1, day2, session1, session2;
+        string courseName, teacherName, startDate, endDate;
 
-        return nullptr;
+        cout << "Create new course: \n";
+        cout << "\tCourse ID: "; cin >> id;
+        cout << "\tCourse name: "; cin >> courseName;
+
+        cout << "\tTeacher name: "; 
+        cin.ignore(1);
+        getline(cin, teacherName, '\n');
+
+        cout << "\tNumber of credits: "; cin >> credits;
+        cout << "\tNumber of maximum students: "; cin >> maxStudents;
+        cout << "\tFirst day: "; cin >> day1;
+        cout << "\tFirst session: "; cin >> session1;
+        cout << "\tSecond day: "; cin >> day2;
+        cout << "\tSecond session: "; cin >> session2;
+        cout << "\tRegistration start date (dd/mm/yyyy): "; cin >> startDate;
+        cout << "\tRegistration end date (dd/mm/yyyy): "; cin >> endDate;
+        
+        Course* course = new Course(
+            id,
+            courseName,
+            teacherName,
+            credits,
+            day1 * 4 + session1,
+            day2 * 4 + session2,
+            startDate,
+            endDate
+        );
+
+        course -> putCourseToFile();
+
+        return course;
     }
 
     void inputCourseFromFile() {
