@@ -7,6 +7,12 @@
 #include "Course.h"
 #include "Student.h"
 
+const int CLASS_OPTIONS_COUNT = 2;
+const string CLASS_OPTIONS[] = {
+    "View class information",
+    "View class scoreboard"
+};
+
 class Class {
 private:
     struct Node {
@@ -76,29 +82,66 @@ public:
         studentsCount++;
     }
 
-    void inputNewStudents() {
-        // TODO: Input class by hand
-        cout << "Enter students number: "; cin >> studentsCount;
-
-        for (int i = 0; i < studentsCount; ++i) 
-            addStudent(Student::inputNewStudent(i));
-
-        dataModified = true;
-    }
-
     void getAllStudentsInfo(int &studentsCount, Student* *&students) {
-        // TODO: Get all students informations
         studentsCount = this -> studentsCount;
         students = new Student*[studentsCount];
 
         Node* cur = head;
         for (int i = 0; cur; ++i) {
             students[i] = cur -> data;
+
+            students[i] -> getOverallMarksCredits();
+
             cur = cur -> next;
+        }
+    }
+
+    void displayClassInformation() {
+        string tableTitle = "CLASS " + name;
+
+        int columnsCount = 6;
+        int columnsWidth[columnsCount] = { 10, 15, 25, 15, 15, 25 };
+        string columnsName[columnsCount] = {
+            "No",
+            "Student ID",
+            "Last name",
+            "First name",
+            "Gender",
+            "Date of birth"
+        };
+
+        int rowsCount = studentsCount;
+
+        string** table = new string* [rowsCount];
+
+        Node* cur = head;
+        for (int i = 0; cur; ++i, cur = cur -> next) {
+            Student* student = cur -> data;
+
+            table[i] = new string[columnsCount] {
+                to_string(student -> getNo()),
+                to_string(student -> getId()),
+                student -> getLastName(),
+                student -> getFirstName(),
+                student -> getGender(),
+                student -> getDob()
+            };
+        }
+
+        system("cls");
+        drawTable(3, tableTitle, columnsCount, columnsWidth, columnsName, rowsCount, table);
+        getch();
+
+        for (int i = 0; i < rowsCount; ++i) delete[] table[i];
+        delete[] table;
     }
 
     void displayClassScoreboard(Semester* lastedSemester) {
-        // TODO: Display class scoreboard
+        if (!lastedSemester) {
+            drawOkayBox("Error!!!", "This school year does not have any semester!");
+            return;
+        }
+
         Course* *courses;
         int coursesCount;
         lastedSemester -> getAllCoursesInfo(coursesCount, courses);
@@ -106,78 +149,204 @@ public:
         Student* *students;
         int studentsCount;
         getAllStudentsInfo(studentsCount, students);
-        cout << studentsCount << '\n';
 
-        for (int i = 0; i < studentsCount; ++i) {
-            students[i] -> display();
+        /// TABLE 
+        string tableTitle = "CLASS " + name + " SCOREBOARD IN " + lastedSemester -> getName() + " SEMESTER";
 
-            cout << "Final mark of all courses: \n";
+        int columnsCount = 6 + coursesCount;
+        int columnsWidth[columnsCount] = {5, 10, 25, 15};
+        string columnsName[columnsCount] = {
+            "No",
+            "Student ID",
+            "Full name",
+            "Gender"
+        };
+        for (int i = 0; i < coursesCount; ++i) {
+            columnsWidth[4 + i] = 8;
+            columnsName[4 + i] = courses[i] -> getCourseID();
+        }
+        columnsWidth[4 + coursesCount] = 7;
+        columnsName[4 + coursesCount] = "GPA";
+        columnsWidth[5 + coursesCount] = 13;
+        columnsName[5 + coursesCount] = "Overall GPA";
 
-            double totalFinalMark = 0.0;
+        int rowsCount = studentsCount;
+
+        string** table = new string* [rowsCount];
+
+        for (int i = 0; i < rowsCount; ++i) {
+            Student* student = students[i];
+
+            table[i] = new string[columnsCount] {
+                to_string(student -> getNo()),
+                to_string(student -> getId()),
+                student -> getFullName(),
+                student -> getGender()
+            };
+
+            double totalMarks = 0.0;
             int totalCredits = 0;
 
-            for (int j = 0; j < coursesCount; ++j) {
-                Student* scoredStudent = courses[j] -> findStudentFromID(students[i] -> getId());
-                if (scoredStudent) {
-                    cout << courses[j] -> getCourseName() << ": " << scoredStudent -> getFinalMark() << ' ';
+            for (int j = 0; j < coursesCount; ++j) 
+                if (courses[j] -> isScored()) {
+                    Student* scoredStudent = courses[j] -> findStudentFromID(student -> getId());
 
-                    totalFinalMark += scoredStudent -> getFinalMark() * courses[j] -> getCredits();
-                    totalCredits += courses[j] -> getCredits();
-                }
-            }
-            cout << '\n';
+                    if (scoredStudent) {
+                        table[i][4 + j] = toStringPrecision(scoredStudent -> getTotalMark());
 
-            cout << "GPA of " << lastedSemester -> getName() << " semester: " << totalFinalMark / totalCredits << '\n';
+                        totalMarks += scoredStudent -> getTotalMark() * courses[j] -> getCredits();
+                        totalCredits += courses[j] -> getCredits();
+                    } else
+                        table[i][4 + j] = "x";
+                } else
+                    table[i][4 + j] = "x";
+
+            if (totalCredits == 0)
+                table[i][4 + coursesCount] = "x";
+            else 
+                table[i][4 + coursesCount] = toStringPrecision(totalMarks / totalCredits);
+
+            if (student -> getOverallCredits() == 0) 
+                table[i][5 + coursesCount] = "x";
+            else
+                table[i][5 + coursesCount] = toStringPrecision(student -> getOverallGPA());
         }
+
+        system("cls");
+        drawTable(3, tableTitle, columnsCount, columnsWidth, columnsName, rowsCount, table);
+        getch();
+
+        for (int i = 0; i < rowsCount; ++i) delete[] table[i];
+        delete[] table;
 
         delete[] students;
         delete[] courses;
     }
 
     void displayMenu(Semester* lastedSemester) {
-        int choice;
+        int titleLines = 1;
+        string title[titleLines] = {
+            "CLASS " + name
+        };
 
-        cout << "This is class " << name << ":\n";
-        cout << "\t1. View class info\n";
-        cout << "\t2. View class score board\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
+        int choice = 0;
+        while (1) {
+            drawMenu(titleLines, title, CLASS_OPTIONS_COUNT, CLASS_OPTIONS, choice);
 
-        if (choice == 1) {
-            Node* cur = head;
-            while (cur) {
-                cout << '\t';
-                cur -> data -> display();
-                cur = cur -> next;
+            switch (choice) {
+                case 0:
+                    displayClassInformation();
+                    break;
+                case 1:
+                    displayClassScoreboard(lastedSemester);
+                    break;
+                default:
+                    return;
             }
-        } else 
-            displayClassScoreboard(lastedSemester);
+        }
     }
 
-    static Class* inputNewClass() {
-        int choice;
+    static Class* inputNewClass(string schoolYearName) {
+        string title = "Input new class";
 
-        cout << "Add new class: \n";
-        cout << "\t1. Add manually\n";
-        cout << "\t2. Add from .csv file\n";
-        cout << "Enter your choice: "; cin >> choice;
+        const int containsCount = 2;
+        string contains[containsCount] = {
+            "1. Input manually by hand",
+            "2. Input from CSV file"
+        };
 
-        string className;
-        cout << "Enter class name: "; cin >> className;
+        const int optionsCount = 3;
+        string options[optionsCount] = {
+            "Manually",
+            "CSV File",
+            "Cancel"  
+        };
 
-        Class* newClass = new Class(className);
+        int choice = 2;
+        drawBox(title, containsCount, contains, optionsCount, options, choice);
 
-        if (choice == 1) {
-            newClass -> inputNewStudents();
-        } else {
-            // TODO: Input new class from file
+        if (choice == 2) return nullptr;
+
+        string className = "";
+        if (drawInputBox("Input new class", 40, "Enter class name: ", className)) {
+            Class* newClass = new Class(className, schoolYearName);
+
+            if (choice == 0) {
+                if (!newClass -> inputNewClassByHand()) {
+                    delete newClass;
+                    return nullptr;
+                }
+            } else if (choice == 1) {
+                if (!newClass -> inputNewClassFromFile()) {
+                    delete newClass;
+                    return nullptr;
+                }
+            }
+
+            newClass -> createStudentsFiles();
+
+            return newClass;
+        } else
+            return nullptr;
+    }
+
+    bool inputNewClassByHand() {
+        string sStudentsCount;
+        if (drawInputBox("Input class " + name, 40, "Enter number of students in class: ", sStudentsCount)) {
+            int studentsCount = stoi(sStudentsCount);
+            
+            for (int i = 0; i < studentsCount; ++i) {
+                Student *newStudent = Student::inputNewStudent(i + 1);
+
+                if (newStudent) 
+                    addStudent(newStudent);
+                else
+                    return false;
+            }
+
+            dataModified = true;
+
+            return true;
+        } else
+            return false;
+    }
+
+    bool inputNewClassFromFile() {
+        string dir = "";
+
+        if (drawInputBox("Input class " + name, 100, "File NewClass.csv directory: ", dir)) {
+            ifstream src(dir);
+        
+            if (src) {
+                ofstream dst(CLASSES_FILE + name + ".csv");
+
+                char c;
+                while (src.get(c)) dst << c;
+
+                dst.close();
+                src.close();
+
+                getClassFromFile();
+
+                return true;
+            } else {
+                drawOkayBox("Error!!!", "Can't open file, please check your directory.");
+
+                return false;
+            }
+        } else
+            return false;
+    }
+
+    void createStudentsFiles() {
+        Node* cur = head;
+        while (cur) {
+            cur -> data -> createStudentFiles(schoolYearName, name);
+            cur = cur -> next;
         }
-
-        return newClass;
     }
 
     void getClassFromFile() {
-        // TODO: Get class from file
         ifstream inp(CLASSES_FILE + name + ".csv");
 
         if (inp) {
@@ -196,8 +365,7 @@ public:
     }
 
     void putClassToFile() {
-        // TODO: Put class informations to file
-         ofstream out(CLASSES_FILE + name + ".csv");
+        ofstream out(CLASSES_FILE + name + ".csv");
 
         Node* cur = head;
         while (cur) {
