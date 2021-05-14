@@ -5,12 +5,16 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <filesystem>
+#include <iomanip>
+#include <windows.h>
+
+#include "Date.h"
+#include "Picasso.h"
 
 using namespace std;
 
 /// CURRENT TIME (dd/mm/yyyy)
-const string CURRENT_TIME = "01/01/2021";
+Date CURRENT_DATE("01/01/2021");
 
 /// SCHOOL
 const string SCHOOL_FILE = "Data/School.txt";
@@ -32,7 +36,7 @@ const string SEMESTERS_NAMES[] = {"Fall", "Summer", "Autumn"};
 /// COURSE
 const string COURSES_FILE = "Data/Courses/";
 const string DAY_OF_WEEK[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-const string SESSIONS[] = {"Session 1 (07:30)", "Session 2 (09:30)", "Session 3 (13:30)", "Session 4 (15:30)"};
+const string SESSIONS[] = {"SS1 (07:30)", "SS2 (09:30)", "SS3 (13:30)", "SS4 (15:30)"};
 
 /// ACCOUNT
 const string ACCOUNTS_FILE = "Data/Accounts.txt";
@@ -48,5 +52,13 @@ const int STAFF_COMPONENTS_COUNT = 5;
 
 /// STUDENT ACCOUNT
 const int MAX_ENROLLED_COURSES = 5;
+
+string toStringPrecision(double d) {
+    stringstream s;
+
+    s << fixed << setprecision(3) << d;
+
+    return s.str();
+}
 
 #endif
