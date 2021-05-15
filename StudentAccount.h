@@ -96,10 +96,10 @@ public:
         return course;
     }
 
-    void removeCourse(int courseID) {
+    void removeCourse(string courseID) {
         int id = -1;
         for (int i = 0; i < enrolledCoursesCount; ++i)
-            if (enrolledCourses[i] -> getID() == courseID) {
+            if (enrolledCourses[i] -> getCourseID().compare(courseID) == 0) {
                 id = i;
                 break;
             }
@@ -175,13 +175,13 @@ public:
                 char choice = getch();
 
                 if (choice == '1') {
-                    int id;
+                    string courseID;
 
                     cout << "Enter the course ID you want to remove: ";
-                    cin >> id;
+                    cin >> courseID;
 
                     if (drawYesNoBox("Warning!!!", "Do you really want to remove this course?")) 
-                        removeCourse(id);
+                        removeCourse(courseID);
                 } else
                     return;
             } else {
