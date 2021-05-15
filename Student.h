@@ -170,22 +170,6 @@ public:
         }
     }
 
-    void display() {
-        if (!scored) {
-            cout << "No: " << no << '\n';
-            Person::display();
-        } else {
-            cout 
-                << no << ' ' 
-                << getId() << ' ' 
-                << getFullName() << ' ' 
-                << totalMark << ' ' 
-                << finalMark << ' ' 
-                << midtermMark << ' ' 
-                << otherMark << '\n';
-        }
-    }
-
     static Student* inputNewStudent(int no) {
         string title = "Input student No. " + to_string(no) + " information";
 

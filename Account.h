@@ -121,7 +121,7 @@ public:
 
     static void addNewAccount(int id, string pass) {
         ofstream out(ACCOUNTS_FILE, ios::app);
-        out << id << ' ' << pass << '\n';
+        out << '\n' << id << ' ' << pass;
         out.close();
     }
 
